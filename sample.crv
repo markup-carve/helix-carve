@@ -1,0 +1,58 @@
+%% This is a line comment.
+
+# Heading level 1
+
+## Heading level 2
+
+### Heading level 3
+
+#### Heading level 4
+
+##### Heading level 5
+
+###### Heading level 6
+
+A paragraph with *bold*, /italic/, /*bold italic*/, _underline_, and
+~strikethrough~ inline styles, plus `verbatim code` and a $`a^2 + b^2`$ math
+span. Trailing comment here. %% inline trailing comment
+
+- Dash bullet item
+- Another dash item
+  - Nested dash item
+* Star bullet item
+
+1. First ordered item
+2. Second ordered item
+
+- [ ] Unchecked task
+- [x] Checked task
+
+term
+: definition of the term
+
+> A block quote line.
+> Second quoted line.
+
+| Name  | Score |
+|=======|=======|
+| Alice | 10    |
+| Bob   | 20    |
+
+{.note}
+::: warning
+This is a div with a class and content.
+:::
+
+A [link text](https://example.com) and an autolink <https://carve.example>.
+
+![image alt](image.png)
+
+``` python
+def greet(name):
+    return f"hello {name}"
+```
+
+%%%
+A fenced comment block.
+Multiple lines are ignored.
+%%%

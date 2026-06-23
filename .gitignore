@@ -1,0 +1,13 @@
+# Compiled tree-sitter grammars (built locally by `hx --grammar build`)
+*.so
+*.dylib
+*.dll
+*.wasm
+
+# Local Helix test config / runtime used while developing this repo
+xdg/
+xdg-data/
+
+# Editor / OS noise
+.DS_Store
+*.swp

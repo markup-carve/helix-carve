@@ -1,0 +1,25 @@
+# Carve language support for Helix.
+#
+# Merge this into your ~/.config/helix/languages.toml (or the languages.toml in
+# your $HELIX_RUNTIME). See README.md for full install steps.
+#
+# The [[grammar]] source below points at a LOCAL checkout so the grammar builds
+# fully offline. To install from the published grammar instead, swap the
+# `source` line for the git form (shown commented out underneath).
+
+[[language]]
+name = "carve"
+scope = "source.carve"
+file-types = ["crv", "carve"]
+roots = []
+comment-token = "%%"
+indent = { tab-width = 2, unit = "  " }
+
+[[grammar]]
+name = "carve"
+source = { path = "/media/mark/data/work/git/tree-sitter-carve" }
+
+# Published (git) form -- use this when installing from the upstream repo:
+# [[grammar]]
+# name = "carve"
+# source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "7b4f227096ad678c319135e9a65b7a68eb4c5e10" }
