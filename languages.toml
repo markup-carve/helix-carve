@@ -22,4 +22,4 @@ source = { path = "/media/mark/data/work/git/tree-sitter-carve" }
 # Published (git) form -- use this when installing from the upstream repo:
 # [[grammar]]
 # name = "carve"
-# source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "7b4f227096ad678c319135e9a65b7a68eb4c5e10" }
+# source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "d1a7d68e5c0ef9edcbc2d39d033e22de41c6f865" }
