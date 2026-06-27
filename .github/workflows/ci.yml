@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    name: Validate Helix config
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate languages.toml parses
+        run: |
+          python - <<'PY'
+          import tomllib
+          with open("languages.toml", "rb") as handle:
+              tomllib.load(handle)
+          print("OK: languages.toml is valid TOML")
+          PY
+
+      - name: Check tree-sitter query files are present
+        run: |
+          for q in highlights indents injections textobjects; do
+            test -s "runtime/queries/carve/$q.scm" || { echo "Missing or empty runtime/queries/carve/$q.scm"; exit 1; }
+          done
+          echo "All Helix query files present."
