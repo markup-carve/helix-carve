@@ -3,9 +3,9 @@
 # Merge this into your ~/.config/helix/languages.toml (or the languages.toml in
 # your $HELIX_RUNTIME). See README.md for full install steps.
 #
-# The [[grammar]] source below points at a LOCAL checkout so the grammar builds
-# fully offline. To install from the published grammar instead, swap the
-# `source` line for the git form (shown commented out underneath).
+# The [[grammar]] source below points at the published upstream grammar. For
+# offline grammar development against a local checkout, swap the `source` line
+# for the path form (shown commented out underneath).
 
 [[language]]
 name = "carve"
@@ -17,9 +17,9 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "carve"
-source = { path = "/media/mark/data/work/git/tree-sitter-carve" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "d1a7d68e5c0ef9edcbc2d39d033e22de41c6f865" }
 
-# Published (git) form -- use this when installing from the upstream repo:
+# Local (path) form -- use this for offline grammar development:
 # [[grammar]]
 # name = "carve"
-# source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "d1a7d68e5c0ef9edcbc2d39d033e22de41c6f865" }
+# source = { path = "/path/to/tree-sitter-carve" }
