@@ -31,3 +31,53 @@ jobs:
             test -s "runtime/queries/carve/$q.scm" || { echo "Missing or empty runtime/queries/carve/$q.scm"; exit 1; }
           done
           echo "All Helix query files present."
+
+  grammar:
+    name: Grammar parses sample files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install tree-sitter CLI
+        # Pinned to the 0.26 minor: validated against this grammar repo layout
+        # (tree-sitter.json config, committed src/parser.c).
+        run: npm install -g tree-sitter-cli@0.26
+
+      - name: Extract pinned grammar rev from languages.toml
+        id: grammar-rev
+        run: |
+          rev=$(sed -n 's/.*rev = "\([0-9a-f]\{40\}\)".*/\1/p' languages.toml | head -n1)
+          if [ -z "$rev" ]; then
+            echo "Could not extract grammar rev from languages.toml"
+            exit 1
+          fi
+          echo "Pinned tree-sitter-carve rev: $rev"
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+
+      - name: Clone tree-sitter-carve at pinned rev
+        run: |
+          git clone https://github.com/markup-carve/tree-sitter-carve "$RUNNER_TEMP/tree-sitter-carve"
+          git -C "$RUNNER_TEMP/tree-sitter-carve" checkout "${{ steps.grammar-rev.outputs.rev }}"
+
+      - name: Build grammar
+        # src/parser.c is committed upstream, so no `tree-sitter generate` needed.
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: tree-sitter build
+
+      - name: Parse sample .crv files
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: |
+          files=$(find "$GITHUB_WORKSPACE" -name '*.crv' -not -path '*/.git/*' | sort)
+          if [ -z "$files" ]; then
+            echo "No .crv sample files found in the repository"
+            exit 1
+          fi
+          echo "Parsing:"
+          echo "$files"
+          # tree-sitter parse exits nonzero if any file yields ERROR/MISSING nodes.
+          tree-sitter parse --quiet $files
+          echo "All sample files parsed without errors."
