@@ -5,8 +5,8 @@
 injections, and indentation, backed by the
 [tree-sitter-carve](https://github.com/markup-carve/tree-sitter-carve) grammar.
 
-Carve is a post-Djot lightweight markup language. Files use the `.crv` (or
-`.carve`) extension.
+Carve is a post-Markdown lightweight markup language. Files use the `.crv`
+extension.
 
 ## What you get
 
@@ -37,7 +37,7 @@ Copy the `[[language]]` and `[[grammar]]` entries from this repo's
 [[language]]
 name = "carve"
 scope = "source.carve"
-file-types = ["crv", "carve"]
+file-types = ["crv"]
 roots = []
 comment-token = "%%"
 indent = { tab-width = 2, unit = "  " }

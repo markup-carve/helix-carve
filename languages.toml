@@ -10,7 +10,7 @@
 [[language]]
 name = "carve"
 scope = "source.carve"
-file-types = ["crv", "carve"]
+file-types = ["crv"]
 roots = []
 comment-token = "%%"
 indent = { tab-width = 2, unit = "  " }
