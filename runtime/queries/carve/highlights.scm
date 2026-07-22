@@ -194,6 +194,9 @@
   (math_marker)
   (math_marker_begin)
   (math_marker_end)
+  (literal_marker)
+  (literal_marker_begin)
+  (literal_marker_end)
   (raw_inline_attribute)
   (raw_inline_marker_begin)
   (raw_inline_marker_end)
@@ -202,6 +205,13 @@
 (math) @markup.raw
 (verbatim) @markup.raw.inline
 (raw_inline) @markup.raw.inline
+
+; An inline literal (!`…`) captures its content verbatim like a code span, but
+; renders as PROSE -- the <code> wrapper is dropped. So only its markers are
+; styled (in the delimiter list above) and the node itself is deliberately left
+; uncaptured, taking the default text style: giving it @markup.raw* would make
+; it look like the code span it explicitly is not. Upstream's @none capture is a
+; Neovim-ism and is dropped here, per the header note.
 
 ; --- Comments -----------------------------------------------------------------
 [
