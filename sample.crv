@@ -16,6 +16,9 @@ A paragraph with *bold*, /italic/, /*bold italic*/, _underline_, and
 ~strikethrough~ inline styles, plus `verbatim code` and a $`a^2 + b^2`$ math
 span. Trailing comment here. %% inline trailing comment
 
+The word cat is !`/kaet/` in IPA, and !`a<b>`{.ipa} carries an attribute --
+an inline literal is verbatim inside but renders as prose, not code.
+
 - Dash bullet item
 - Another dash item
   - Nested dash item
