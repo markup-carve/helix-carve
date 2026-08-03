@@ -68,6 +68,27 @@ jobs:
         working-directory: ${{ runner.temp }}/tree-sitter-carve
         run: tree-sitter build
 
+      # A query naming a node the grammar does not have captures nothing and
+      # highlights nothing, while the file still exists and is non-empty - so
+      # the presence check above passes and the editor quietly shows plain text.
+      # `tree-sitter query` rejects an unknown node type, which is the only
+      # thing that can tell the two apart.
+      - name: Queries reference nodes the pinned grammar has
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: |
+          sample="$RUNNER_TEMP/query-probe.crv"
+          printf '# H\n\n- item\n\n> quote\n' > "$sample"
+          failed=0
+          for q in "$GITHUB_WORKSPACE"/runtime/queries/carve/*.scm; do
+            if tree-sitter query "$q" "$sample" >/dev/null; then
+              echo "OK   $(basename "$q")"
+            else
+              echo "FAIL $(basename "$q")"
+              failed=1
+            fi
+          done
+          exit "$failed"
+
       - name: Parse sample .crv files
         working-directory: ${{ runner.temp }}/tree-sitter-carve
         run: |
