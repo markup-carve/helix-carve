@@ -252,6 +252,9 @@
 
 (boolean_attribute) @attribute
 
+; The language attribute: `{:fr}`, `{:zh-Hant}` (markup-carve/carve#1114).
+(language_attribute) @attribute
+
 ; --- Links / images -----------------------------------------------------------
 (link_text
   ["[" "]"] @punctuation.bracket)
