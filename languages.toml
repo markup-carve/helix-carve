@@ -17,7 +17,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "d93cbf2d45818e9889279f515b1050e25ce5afed" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "b6877de1af5f6d1dde55395ebeee32a0483b1946" }
 
 # Local (path) form -- use this for offline grammar development:
 # [[grammar]]
