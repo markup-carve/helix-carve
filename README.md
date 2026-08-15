@@ -44,7 +44,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "b6877de1af5f6d1dde55395ebeee32a0483b1946" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "17362de88d2c3177e7c6b4d5f83841f38a42ae4d" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
@@ -99,6 +99,8 @@ helix-carve/
 │           ├── injections.scm     # code / raw / math / frontmatter injections
 │           ├── textobjects.scm    # function/class/parameter/entry/comment
 │           └── indents.scm        # container-based indent scopes
+├── scripts/
+│   └── highlight-captures.mjs     # what the highlights query actually paints
 ├── sample.crv                     # feature-exercising example document
 ├── README.md
 ├── LICENSE                        # MIT
@@ -118,6 +120,27 @@ helix-carve/
 - **Textobject suffixes.** Helix uses `.inside` / `.around` (not Neovim's
   `.inner` / `.outer`), and supports a fixed set of kinds; only the kinds that
   map onto Carve are kept.
+- **Dropped priority directives.** Upstream tags some patterns with `(#set!
+  priority N)`. This file carries none: Helix 25.07 ships no priority directive
+  in any of its own bundled queries, and layers overlapping captures in the
+  order they are written so the later one patches over the earlier - which is
+  already what makes `@markup.heading.1` win over the `(heading)
+  @markup.heading` line above it. Where upstream expresses precedence with a
+  number, the port expresses it with position, so new patterns have to go in the
+  right place rather than anywhere in the file.
+
+## Effective captures
+
+`tree-sitter query` prints every match. Several patterns claim the same node and
+only one of them reaches the screen, so a pattern that never wins looks exactly
+like a pattern that is not there - a compile check cannot tell them apart.
+`scripts/highlight-captures.mjs` resolves the winner at a position the way Helix
+does, and asserts it. It shells out to the tree-sitter CLI, so it needs no
+dependencies of its own; point it at a built checkout of the pinned grammar:
+
+```bash
+TS_CWD=/path/to/tree-sitter-carve node scripts/highlight-captures.mjs
+```
 
 ## License
 
