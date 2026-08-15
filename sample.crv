@@ -59,3 +59,26 @@ def greet(name):
 A fenced comment block.
 Multiple lines are ignored.
 %%%
+
+::: figure
+![Left panel](left.png)
+^ (a) The left panel
+
+![Right panel](right.png)
+^ (b) The right panel
+:::
+^ Figure #: A bare `::: figure` opener is one composite figure.
+
+::: figure "A titled figure div"
+An opener with a title is a generic container, not a group.
+:::
+
+::: figure [gallery]
+So is one with a label.
+:::
+
+::: figure
+:::: figure
+Groups do not nest, so this inner opener is a generic container.
+::::
+:::

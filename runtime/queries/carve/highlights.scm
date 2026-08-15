@@ -241,6 +241,92 @@
   (class_name)
 ] @type
 
+; --- Composite figures --------------------------------------------------------
+; PART 9 4c (markup-carve/carve#1215). The kind word `figure` is RESERVED among
+; the `:::` types: a BARE opener - the fence, its separator, the word, and
+; nothing else - is one figure of ordered panels, not an admonition. `!title
+; !label` is the whole distinction, and it is why this is a query rather than a
+; grammar change: the parse tree already tells the two apart by which fields the
+; opener carries. An opener with a quoted title or a `[label]` matches nothing
+; here and keeps the generic `@type` above.
+;
+; The group caption needs no rule. It is an ordinary `^ ` line one line below the
+; closing fence, and the grammar places it as a SIBLING of the container rather
+; than inside it, where the `(caption)` patterns above already claim it.
+;
+; PRECEDENCE IS ORDER HERE, not `(#set! priority N)`. Upstream tags these
+; patterns 105 and 110 against a default of 100; this file carries no `#set!`
+; directive at all, and neither does any bundled query in Helix 25.07, because
+; Helix layers overlapping captures in the order they are written so the later
+; one patches over the earlier - which is
+; what already makes `@markup.heading.1` win over the `(heading) @markup.heading`
+; above it. The upstream priorities are redundant with that order: 100 < 105 <
+; 110 is the order these patterns are written in. Keep any new pattern in this
+; block below the generic `@type` above.
+((div
+  class: (class_name) @type.builtin
+  !title
+  !label)
+  (#eq? @type.builtin "figure"))
+
+; GROUPS DO NOT NEST: a bare `::: figure` inside an open group is a generic
+; container, not an inner group, at any depth. A query has no transitive closure
+; - there is no "any descendant" - so the reach is spelled as wildcard chains
+; rooted at the group, one per intervening level, each restoring `@type` on the
+; inner opener from below the pattern above.
+;
+; Three levels covers every shape the language produces: a direct child of the
+; group's content; one intervening container (`div` > `content` > `div`, and
+; `block_quote` > `content` > `div`); and a list item
+; (`list` > `list_item` > `list_item_content` > `div`). The wildcards are
+; deliberate - naming the container types would have to be revisited every time
+; a block gains a content field, and the chain LENGTH is the real constraint.
+;
+; RESIDUAL, written down rather than left to be rediscovered: a bare opener
+; reached through more than three levels - a quote inside a list item inside the
+; group, say - keeps the group capture. The parse tree is right either way; only
+; the color is not.
+((div
+  class: (class_name) @_group.class
+  !title
+  !label
+  content: (content
+    (div
+      class: (class_name) @type
+      !title
+      !label)))
+  (#eq? @_group.class "figure")
+  (#eq? @type "figure"))
+
+((div
+  class: (class_name) @_group.class
+  !title
+  !label
+  content: (content
+    (_
+      (_
+        (div
+          class: (class_name) @type
+          !title
+          !label)))))
+  (#eq? @_group.class "figure")
+  (#eq? @type "figure"))
+
+((div
+  class: (class_name) @_group.class
+  !title
+  !label
+  content: (content
+    (_
+      (_
+        (_
+          (div
+            class: (class_name) @type
+            !title
+            !label))))))
+  (#eq? @_group.class "figure")
+  (#eq? @type "figure"))
+
 (identifier) @tag
 
 (key_value

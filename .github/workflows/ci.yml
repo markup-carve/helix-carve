@@ -89,6 +89,18 @@ jobs:
           done
           exit "$failed"
 
+      # Compiling a query only proves its node names exist. Several patterns
+      # claim the same node and only one color reaches the screen, so a pattern
+      # that never wins is indistinguishable from a pattern that is absent, and
+      # both stay green above. This resolves what Helix would actually paint at
+      # a position - overlapping captures are layered in order, so the last one
+      # wins - and asserts it.
+      - name: Resolve effective highlight captures
+        working-directory: ${{ github.workspace }}
+        env:
+          TS_CWD: ${{ runner.temp }}/tree-sitter-carve
+        run: node scripts/highlight-captures.mjs
+
       - name: Parse sample .crv files
         working-directory: ${{ runner.temp }}/tree-sitter-carve
         run: |
