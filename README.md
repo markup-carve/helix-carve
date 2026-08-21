@@ -19,6 +19,11 @@ extension.
 - Language injections so fenced code blocks, raw blocks, inline raw spans, math
   (LaTeX), and frontmatter are highlighted with their target grammar.
 - A `%%` comment token, so `gc` comment toggling works.
+- Language-server support via
+  [carve-lsp](https://github.com/markup-carve/carve-lsp) - diagnostics, hover,
+  completion, go-to-definition, workspace-wide rename, find-references,
+  code actions and formatting. Optional: install the server and it works,
+  skip it and everything above still does.
 
 The queries are Helix-flavored: they use Helix's themable scope list
 (`@markup.heading.1`, `@markup.bold`, `@markup.raw.inline`,
@@ -74,14 +79,32 @@ cp runtime/queries/carve/*.scm ~/.config/helix/runtime/queries/carve/
 Alternatively, set `HELIX_RUNTIME` to a directory that contains both
 `grammars/` and `queries/`, and place the queries under `queries/carve/` there.
 
-### 4. Verify
+### 4. Install the language server (optional)
+
+```bash
+npm i -g @markup-carve/carve-lsp
+```
+
+`languages.toml` already declares it as `carve-lsp --stdio`. Skip this step and
+Helix simply reports the server as unavailable; highlighting, textobjects,
+injections and indentation are unaffected.
+
+What it adds over the queries: the queries know the document's SHAPE, the server
+knows what its identifiers MEAN. Unresolved `[^footnote]` references, `</#id>`
+cross-references that point at nothing, and Markdown habits that silently render
+wrong in Carve (`**bold**` is two literal asterisks around bold text here) are
+diagnostics, not highlighting. Rename is workspace-wide, so renaming a heading
+id updates every reference to it.
+
+### 5. Verify
 
 ```bash
 hx --health carve
 ```
 
 You should see the parser, highlight queries, textobject queries, and indent
-queries all marked present.
+queries all marked present. If you installed the server, the language servers
+line names `carve-lsp`.
 
 Open a `.crv` file (for example [`sample.crv`](sample.crv)) in Helix and
 confirm headings, emphasis, code, lists, links, tables, divs, and comments are
