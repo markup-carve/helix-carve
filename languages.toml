@@ -7,13 +7,37 @@
 # offline grammar development against a local checkout, swap the `source` line
 # for the path form (shown commented out underneath).
 
+# The language server is OPTIONAL: everything above works without it, and Helix
+# reports a missing server as unavailable rather than failing to open the file.
+# Install it with `npm i -g @markup-carve/carve-lsp`.
+#
+# It is worth installing, because the tree-sitter queries and the server answer
+# different questions. The queries know the shape of the document; the server
+# knows what its identifiers MEAN - which `[^note]` has no definition, which
+# `</#id>` points at nothing, and that `**bold**` is a Markdown habit that
+# renders as literal asterisks in Carve.
+[language-server.carve-lsp]
+command = "carve-lsp"
+args = ["--stdio"]
+
 [[language]]
 name = "carve"
 scope = "source.carve"
 file-types = ["crv"]
-roots = []
+# `.git` rather than empty: rename, find-references and go-to-definition are
+# WORKSPACE-wide in carve-lsp - a heading id renamed in one file updates every
+# `</#id>` that points at it - and a server given no root can only see the open
+# document. This matches the root pattern carve-lsp documents.
+roots = [".git"]
 comment-token = "%%"
 indent = { tab-width = 2, unit = "  " }
+language-servers = ["carve-lsp"]
+
+# Not set here: `auto-format = true`. carve-lsp's default formatter is
+# conservative (whitespace only), so it is safe to enable, but format-on-save
+# rewrites files and that should be the reader's choice rather than a default
+# arriving with a syntax package. Add it to your own [[language]] block if you
+# want it.
 
 [[grammar]]
 name = "carve"
