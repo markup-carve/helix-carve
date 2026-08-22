@@ -164,7 +164,3 @@ dependencies of its own; point it at a built checkout of the pinned grammar:
 ```bash
 TS_CWD=/path/to/tree-sitter-carve node scripts/highlight-captures.mjs
 ```
-
-## License
-
-The bundled grammar (tree-sitter-carve) is MIT-licensed by its authors.
