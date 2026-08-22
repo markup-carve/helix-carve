@@ -167,5 +167,4 @@ TS_CWD=/path/to/tree-sitter-carve node scripts/highlight-captures.mjs
 
 ## License
 
-MIT. See [LICENSE](LICENSE). The bundled grammar (tree-sitter-carve) is also
-MIT-licensed by its authors.
+The bundled grammar (tree-sitter-carve) is MIT-licensed by its authors.
