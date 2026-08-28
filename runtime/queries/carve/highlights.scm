@@ -124,7 +124,17 @@
   (list_marker_upper_roman_parens)
 ] @markup.list.numbered
 
+; A definition list is two markers, not one: `::` opens the term and `:` opens
+; the description. Only the first was ported, so every description marker in a
+; definition list was unpainted.
 (list_marker_definition) @markup.list.numbered
+
+(list_marker_description) @markup.list.numbered
+
+; The `+` list and block-quote continuation marker (PART 9 SS17). It attaches
+; the next flush-left block to the item above it, so it is a list marker even
+; though it opens no item of its own.
+(list_continuation_marker) @markup.list
 
 (list_marker_task
   (unchecked)) @markup.list.unchecked

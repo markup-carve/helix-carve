@@ -199,6 +199,25 @@ const CASES = [
         at: [0, 4],
         expect: 'punctuation.special',
     },
+
+    /*
+     * THE TWO MARKERS THE PORT DROPPED. A definition list is two markers, not
+     * one, and the `+` continuation is a list marker that opens no item - so
+     * both look like ordinary prose when their capture is missing, which is
+     * how they went unnoticed while every other list marker was covered.
+     */
+    {
+        name: "a definition list's description marker is painted",
+        source: ':: Term\n: The description.\n',
+        at: [1, 0],
+        expect: 'markup.list.numbered',
+    },
+    {
+        name: 'the list continuation marker is painted',
+        source: '- item\n+\nan attached block\n',
+        at: [1, 0],
+        expect: 'markup.list',
+    },
 ];
 
 const dir = mkdtempSync(join(tmpdir(), 'helix-carve-captures-'));
