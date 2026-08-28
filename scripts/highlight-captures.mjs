@@ -154,6 +154,51 @@ const CASES = [
         at: [0, 5],
         expect: 'type.builtin',
     },
+
+    /*
+     * WHAT THE GRAMMAR BUMP BROUGHT. Each row is a node the pinned grammar did
+     * not have before, so each is a capture this file could not have carried -
+     * and four of the five are constructs whose CONTENT already colors itself,
+     * which is what makes an absent capture look like a working one.
+     */
+    {
+        // The node starts at the space in front of the opener, not at the
+        // brace - `(braced_comment [0, 1] - [0, 20])` for the source below.
+        name: 'a braced comment is a comment',
+        source: 'a {% not bold *b* %} z\n',
+        at: [0, 1],
+        expect: 'comment',
+    },
+    {
+        name: 'a crossref with auto text is link text, not a URL',
+        source: '# Intro\n\nsee </#intro>\n',
+        at: [2, 4],
+        expect: 'markup.link.text',
+    },
+    {
+        name: 'an inline note is painted whole',
+        source: 'x ^[a note] c\n',
+        at: [0, 2],
+        expect: 'markup.link.label',
+    },
+    {
+        name: 'the line block sigil is painted',
+        source: '::: |\na\n:::\n',
+        at: [0, 4],
+        expect: 'punctuation.special',
+    },
+    {
+        name: 'the fenced block quote sigil is painted',
+        source: '::: >\na\n:::\n',
+        at: [0, 4],
+        expect: 'punctuation.special',
+    },
+    {
+        name: 'the local hard-break sigil is painted',
+        source: '::: \\\na\n:::\n',
+        at: [0, 4],
+        expect: 'punctuation.special',
+    },
 ];
 
 const dir = mkdtempSync(join(tmpdir(), 'helix-carve-captures-'));

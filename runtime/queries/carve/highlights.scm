@@ -12,33 +12,35 @@
 ; --- Headings -----------------------------------------------------------------
 ; All six levels map correctly to .1 .. .6. The verified Carve heading markers
 ; are "# " (2 chars) through "###### " (7 chars). The whole heading node gets the
-; numbered scope; the leading marker gets @markup.heading.marker.
+; numbered scope; the leading marker gets @markup.heading.marker. The marker
+; carries its whole separator RUN, so the level is matched rather than compared:
+; a `##   h` marker is "##   " and an equality test against "## " lost its level.
 
 (heading) @markup.heading
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.1
-  (#eq? @markup.heading.marker "# "))
+  (#match? @markup.heading.marker "^# +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.2
-  (#eq? @markup.heading.marker "## "))
+  (#match? @markup.heading.marker "^## +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.3
-  (#eq? @markup.heading.marker "### "))
+  (#match? @markup.heading.marker "^### +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.4
-  (#eq? @markup.heading.marker "#### "))
+  (#match? @markup.heading.marker "^#### +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.5
-  (#eq? @markup.heading.marker "##### "))
+  (#match? @markup.heading.marker "^##### +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.6
-  (#eq? @markup.heading.marker "###### "))
+  (#match? @markup.heading.marker "^###### +$"))
 
 ; --- Thematic break / rules ---------------------------------------------------
 (thematic_break) @punctuation.special
@@ -70,6 +72,13 @@
 ; --- Block quotes -------------------------------------------------------------
 (block_quote) @markup.quote
 (block_quote_marker) @punctuation.special
+
+; The colon fence's sigil family: `::: |`, `::: >` and `::: \`. Each opens a
+; container whose body already carries its own color, so the sigil is the only
+; character saying which one opened.
+(line_block_marker) @punctuation.special
+(block_quote_fence_marker) @punctuation.special
+(local_hard_break_marker) @punctuation.special
 
 ; --- Tables -------------------------------------------------------------------
 (table_header) @markup.heading
@@ -218,7 +227,7 @@
   (comment_line)
   (fenced_comment_block)
   (comment)
-  (inline_comment)
+  (braced_comment)
   (trailing_comment)
 ] @comment
 
@@ -236,96 +245,40 @@
 (block_attribute
   ["{" "}"] @punctuation.bracket)
 
+; A `.foo` in an attribute block, and the colon fence's TYPE WORD. The second
+; used to be spelled `class_name` too, which is what the attribute rule is
+; called - `admonition_type` is the construct the fence actually opens.
 [
   (class)
-  (class_name)
+  (admonition_type)
 ] @type
 
 ; --- Composite figures --------------------------------------------------------
 ; PART 9 4c (markup-carve/carve#1215). The kind word `figure` is RESERVED among
 ; the `:::` types: a BARE opener - the fence, its separator, the word, and
-; nothing else - is one figure of ordered panels, not an admonition. `!title
-; !label` is the whole distinction, and it is why this is a query rather than a
-; grammar change: the parse tree already tells the two apart by which fields the
-; opener carries. An opener with a quoted title or a `[label]` matches nothing
-; here and keeps the generic `@type` above.
+; nothing else - is one figure of ordered panels, not an admonition. An opener
+; carrying a quoted title or a `[label]` is not that production and keeps the
+; generic `@type` above.
 ;
-; The group caption needs no rule. It is an ordinary `^ ` line one line below the
-; closing fence, and the grammar places it as a SIBLING of the container rather
-; than inside it, where the `(caption)` patterns above already claim it.
+; ONE PATTERN OVER ONE NODE. This used to be four: a pattern over the type word
+; with `!title !label` predicates, plus three wildcard chains restoring `@type`
+; on a bare opener nested inside a group, because a query has no transitive
+; closure and GROUPS DO NOT NEST at any depth. The chains reached three levels,
+; and a bare opener deeper than that kept the group color. The grammar now
+; reads its own open-block stack, so a bare opener inside an open group is an
+; `admonition_type` in the TREE and no query reconstructs the ancestry.
 ;
-; PRECEDENCE IS ORDER HERE, not `(#set! priority N)`. Upstream tags these
-; patterns 105 and 110 against a default of 100; this file carries no `#set!`
-; directive at all, and neither does any bundled query in Helix 25.07, because
+; The group caption needs no rule. It is an ordinary `^ ` line one line below
+; the closing fence, and the grammar places it as a SIBLING of the container
+; rather than inside it, where the `(caption)` patterns above already claim it.
+;
+; PRECEDENCE IS ORDER HERE, not `(#set! priority N)`. This file carries no
+; `#set!` directive, and neither does any bundled query in Helix 25.07, because
 ; Helix layers overlapping captures in the order they are written so the later
-; one patches over the earlier - which is
-; what already makes `@markup.heading.1` win over the `(heading) @markup.heading`
-; above it. The upstream priorities are redundant with that order: 100 < 105 <
-; 110 is the order these patterns are written in. Keep any new pattern in this
-; block below the generic `@type` above.
-((div
-  class: (class_name) @type.builtin
-  !title
-  !label)
-  (#eq? @type.builtin "figure"))
-
-; GROUPS DO NOT NEST: a bare `::: figure` inside an open group is a generic
-; container, not an inner group, at any depth. A query has no transitive closure
-; - there is no "any descendant" - so the reach is spelled as wildcard chains
-; rooted at the group, one per intervening level, each restoring `@type` on the
-; inner opener from below the pattern above.
-;
-; Three levels covers every shape the language produces: a direct child of the
-; group's content; one intervening container (`div` > `content` > `div`, and
-; `block_quote` > `content` > `div`); and a list item
-; (`list` > `list_item` > `list_item_content` > `div`). The wildcards are
-; deliberate - naming the container types would have to be revisited every time
-; a block gains a content field, and the chain LENGTH is the real constraint.
-;
-; RESIDUAL, written down rather than left to be rediscovered: a bare opener
-; reached through more than three levels - a quote inside a list item inside the
-; group, say - keeps the group capture. The parse tree is right either way; only
-; the color is not.
-((div
-  class: (class_name) @_group.class
-  !title
-  !label
-  content: (content
-    (div
-      class: (class_name) @type
-      !title
-      !label)))
-  (#eq? @_group.class "figure")
-  (#eq? @type "figure"))
-
-((div
-  class: (class_name) @_group.class
-  !title
-  !label
-  content: (content
-    (_
-      (_
-        (div
-          class: (class_name) @type
-          !title
-          !label)))))
-  (#eq? @_group.class "figure")
-  (#eq? @type "figure"))
-
-((div
-  class: (class_name) @_group.class
-  !title
-  !label
-  content: (content
-    (_
-      (_
-        (_
-          (div
-            class: (class_name) @type
-            !title
-            !label))))))
-  (#eq? @_group.class "figure")
-  (#eq? @type "figure"))
+; one patches over the earlier - which is what already makes `@markup.heading.1`
+; win over the `(heading) @markup.heading` above it. Keep any new pattern in
+; this block below the generic `@type` above.
+(figure_group_marker) @type.builtin
 
 (identifier) @tag
 
@@ -396,6 +349,12 @@
   (link_reference_definition)
 ] @markup.link.url
 
+; A cross-reference with auto text is a LINK but not a URL: `</#Intro>` carries
+; a heading id the renderer resolves to the target's own text, so it takes
+; @markup.link.text rather than the @markup.link.url above. It used to parse as
+; an autolink and take that capture, which colored a crossref as a web address.
+(auto_text_link) @markup.link.text
+
 ; --- Abbreviations ------------------------------------------------------------
 (abbreviation_definition
   (abbreviation_marker) @punctuation.special)
@@ -407,6 +366,12 @@
   (reference_label) @markup.link.label)
 (footnote_reference
   (reference_label) @markup.link.label)
+
+; An inline note, `^[content]`. Its content is ordinary inline and highlights
+; itself, so this marks the note as a whole - where it ends is the thing the
+; construct is easy to get wrong about, and a tree dump is the only other place
+; that shows it.
+(inline_note) @markup.link.label
 
 [
   (footnote_marker_begin)
