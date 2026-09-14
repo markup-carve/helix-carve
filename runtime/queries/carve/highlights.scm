@@ -172,6 +172,33 @@
 (symbol) @string.special.symbol
 
 (extension_inline) @function.macro
+
+; --- Reserved include directive -----------------------------------------------
+; PART 9 SS19 (markup-carve/carve#291). `{{ path #section @key:value }}` is
+; reserved at the LANGUAGE level: the core leaves the run literal and a
+; processor expands it only when a host supplies a resolver. A grammar that did
+; not know the shape shredded it into the constructs its own selector is spelled
+; with - `#section` is tag syntax and took @tag, an option slot read as a
+; mention and took @constant. The directive context is what keeps them apart now
+; (markup-carve/tree-sitter-carve#285); these patterns only say what each part IS.
+;
+; The whole node takes @function.macro FIRST so the parts no pattern below names
+; - the padding, and an `include_extra` left by a malformed directive - still
+; read as directive rather than as prose. The parts then patch over it in
+; written order, the same layering `(heading)` already relies on above.
+(include_directive) @function.macro
+
+[
+  (include_open)
+  (include_close)
+] @punctuation.special
+
+(include_path) @string.special.path
+(include_section) @label
+(include_option_name) @variable.parameter
+(include_option_separator) @punctuation.delimiter
+(include_option_value) @constant
+
 (mention) @constant
 (tag) @tag
 
