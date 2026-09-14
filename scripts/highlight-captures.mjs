@@ -218,6 +218,67 @@ const CASES = [
         at: [1, 0],
         expect: 'markup.list',
     },
+
+    /*
+     * THE RESERVED INCLUDE DIRECTIVE (PART 9 SS19, markup-carve/carve#291).
+     * The two rows that matter are the NEGATIVE ones: before the grammar knew
+     * the shape, `#section` parsed as a tag and an option slot as a mention, so
+     * the selector of a construct the core leaves literal was painted as two
+     * unrelated inline constructs. Both now have to resolve to the directive's
+     * own colors, and a row asserting only the path would pass with the old
+     * grammar's tag still on screen.
+     */
+    {
+        name: 'the include directive opens with its own punctuation',
+        source: 'See {{ chapters/intro.crv #intro }} here.\n',
+        at: [0, 4],
+        expect: 'punctuation.special',
+    },
+    {
+        name: "the include directive's path is a path",
+        source: 'See {{ chapters/intro.crv #intro }} here.\n',
+        at: [0, 7],
+        expect: 'string.special.path',
+    },
+    {
+        name: 'the section selector is a label, NOT a tag',
+        source: 'See {{ chapters/intro.crv #intro }} here.\n',
+        at: [0, 26],
+        expect: 'label',
+    },
+    {
+        name: 'an option name is a parameter, NOT a mention',
+        source: 'See {{ ch.crv @level:2 }} here.\n',
+        at: [0, 14],
+        expect: 'variable.parameter',
+    },
+    {
+        name: "an option's value is a constant",
+        source: 'See {{ ch.crv @level:2 }} here.\n',
+        at: [0, 21],
+        expect: 'constant',
+    },
+    /*
+     * The glued selector is the canonical spelling in section 19, and it is a
+     * different token run in the grammar - so it is a separate row, not the
+     * same one with a space removed.
+     */
+    {
+        name: 'a glued selector is still a section, not a tag',
+        source: 'See {{ chapters/intro.crv#intro }} here.\n',
+        at: [0, 25],
+        expect: 'label',
+    },
+    /*
+     * Control: a `#tag` that is NOT inside a directive keeps the tag color, so
+     * the rows above cannot pass by the tag pattern having been deleted.
+     */
+    {
+        name: 'control: a tag outside a directive is still a tag',
+        source: 'See #intro here.\n',
+        at: [0, 4],
+        expect: 'tag',
+    },
 ];
 
 const dir = mkdtempSync(join(tmpdir(), 'helix-carve-captures-'));

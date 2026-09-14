@@ -48,6 +48,9 @@ This is a div with a class and content.
 
 A [link text](https://example.com) and an autolink <https://carve.example>.
 
+See {{ chapters/intro.crv #intro }} and {{ appendix.crv @level:2 }} - a reserved
+include directive stays literal in the core, and its selector is not a tag.
+
 ![image alt](image.png)
 
 ``` python

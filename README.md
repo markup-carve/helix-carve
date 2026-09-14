@@ -49,7 +49,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "c515ba34838c3c5933694ce621575caa82aaf3bf" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "fe42577d8780ca00b52f832f22c6fa33d1b065ac" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
@@ -143,6 +143,11 @@ helix-carve/
 - **Textobject suffixes.** Helix uses `.inside` / `.around` (not Neovim's
   `.inner` / `.outer`), and supports a fixed set of kinds; only the kinds that
   map onto Carve are kept.
+- **The include directive carries a base layer.** Upstream paints the PARTS of
+  a `{{ ... }}` directive and leaves the rest of the run uncolored. The port
+  adds `(include_directive) @function.macro` underneath them, so the padding and
+  a malformed `include_extra` read as directive rather than as prose; the part
+  patterns still win where they match.
 - **Dropped priority directives.** Upstream tags some patterns with `(#set!
   priority N)`. This file carries none: Helix 25.07 ships no priority directive
   in any of its own bundled queries, and layers overlapping captures in the
