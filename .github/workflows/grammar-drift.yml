@@ -10,15 +10,19 @@ name: Grammar drift
 # differently between the two revisions - including five the pinned grammar
 # could not parse without an ERROR node at all.
 #
-# This job is the one check that looks OUTWARD. It reports rather than gates:
-# being behind is normal for a day or two, and a red build for that would be
-# noise. It fails only when the pin is not a real commit on upstream main,
-# which is a defect here rather than upstream being ahead.
+# This job is the one check that looks OUTWARD. A pin behind upstream main
+# fails it: a warning on a green run went unread while the pin fell behind.
+# The fix for a red run is a re-vendor pull request.
 
 on:
   schedule:
     - cron: "45 6 * * *"
   workflow_dispatch:
+    inputs:
+      rev:
+        description: "Check this grammar revision instead of the languages.toml pin"
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -37,9 +41,12 @@ jobs:
           fetch-depth: 0
 
       - name: Compare the pinned revision against tree-sitter-carve main
+        env:
+          REV_OVERRIDE: ${{ inputs.rev }}
         run: |
           set -euo pipefail
-          rev="$(grep -oE 'tree-sitter-carve[^0-9a-f]*rev *= *"[0-9a-f]{40}"' languages.toml | grep -oE '[0-9a-f]{40}' | head -1)"
+          rev="${REV_OVERRIDE:-}"
+          [ -n "${rev}" ] || rev="$(grep -oE 'tree-sitter-carve[^0-9a-f]*rev *= *"[0-9a-f]{40}"' languages.toml | grep -oE '[0-9a-f]{40}' | head -1)"
           if [ -z "${rev}" ]; then
             echo "::error::languages.toml: the [[grammar]] source has no 40-hex rev"
             exit 1
@@ -56,5 +63,6 @@ jobs:
           echo "grammar pin: ${rev} ($(git -C tree-sitter-carve log -1 --format=%s "${rev}"))"
           echo "tree-sitter-carve main is ${behind} commit(s) ahead"
           if [ "${behind}" -gt 0 ]; then
-            echo "::warning::the grammar pin is ${behind} commit(s) behind tree-sitter-carve main"
+            echo "::error::the grammar pin ${rev} is ${behind} commit(s) behind tree-sitter-carve main $(git -C tree-sitter-carve rev-parse origin/main); re-vendor the grammar"
+            exit 1
           fi
