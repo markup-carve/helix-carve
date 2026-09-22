@@ -162,11 +162,11 @@ const CASES = [
      * which is what makes an absent capture look like a working one.
      */
     {
-        // The node starts at the space in front of the opener, not at the
-        // brace - `(braced_comment [0, 1] - [0, 20])` for the source below.
+        // The node starts at the brace - `(braced_comment [0, 2] - [0, 20])`
+        // for the source below. Before 0.1.6 it began at the space in front.
         name: 'a braced comment is a comment',
         source: 'a {% not bold *b* %} z\n',
-        at: [0, 1],
+        at: [0, 2],
         expect: 'comment',
     },
     {
