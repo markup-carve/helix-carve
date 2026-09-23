@@ -110,6 +110,46 @@ Open a `.crv` file (for example [`sample.crv`](sample.crv)) in Helix and
 confirm headings, emphasis, code, lists, links, tables, divs, and comments are
 colored.
 
+## Export and import
+
+### Export to Markdown or HTML
+
+With carve-lsp installed, open the code action menu on a `.crv` file
+(`space` then `a`) and pick **Export as Markdown** or **Export as HTML**. The
+result goes next to the source: `notes.crv` becomes `notes.md` or `notes.html`.
+If Helix leaves the target open as a modified buffer, write it with `:w`. The
+actions need a carve-lsp release newer than 0.1.7.
+
+### Import from Markdown or HTML
+
+Converting the other way uses `carve migrate`, which prints the Carve source to
+stdout. It needs the `carve` CLI on PATH, for example from `cargo install
+carve-lang`. The npm package does not work for this yet: `npx` and its
+installed `carve` exit without output until a carve-js entry-point bug is fixed.
+
+From Helix, with the `.md` file open:
+
+```
+:sh set -- "%{buffer_name}"; carve migrate --from markdown "$1" > "${1%%.*}.crv"
+```
+
+This writes `notes.crv` next to `notes.md`, overwriting an existing one. Helix
+turns `%%` into a single `%` before the shell sees it. `%{buffer_name}` needs
+Helix 25.01 or newer. Use `--from html` for HTML.
+
+To replace the open buffer instead, select everything with `%` and run
+`:pipe carve migrate --from markdown`, then save it under a new name with
+`:w notes.crv`.
+
+Outside the editor, a shell function does the same:
+
+```bash
+carve-import() { carve migrate --from "${2:-markdown}" "$1" > "${1%.*}.crv"; }
+```
+
+`carve-import notes.md` writes `notes.crv`; `carve-import page.html html`
+converts HTML.
+
 ## Files
 
 ```
