@@ -5,7 +5,7 @@
 injections, and indentation, backed by the
 [tree-sitter-carve](https://github.com/markup-carve/tree-sitter-carve) grammar.
 
-Carve is a post-Markdown lightweight markup language. Files use the `.crv`
+Carve is a lightweight markup language for documents. Files use the `.crv`
 extension.
 
 ## What you get
