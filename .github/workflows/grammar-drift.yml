@@ -43,26 +43,4 @@ jobs:
       - name: Compare the pinned revision against tree-sitter-carve main
         env:
           REV_OVERRIDE: ${{ inputs.rev }}
-        run: |
-          set -euo pipefail
-          rev="${REV_OVERRIDE:-}"
-          [ -n "${rev}" ] || rev="$(grep -oE 'tree-sitter-carve[^0-9a-f]*rev *= *"[0-9a-f]{40}"' languages.toml | grep -oE '[0-9a-f]{40}' | head -1)"
-          if [ -z "${rev}" ]; then
-            echo "::error::languages.toml: the [[grammar]] source has no 40-hex rev"
-            exit 1
-          fi
-          if ! git -C tree-sitter-carve cat-file -e "${rev}^{commit}" 2>/dev/null; then
-            echo "::error::the grammar pins ${rev}, which is not a commit in markup-carve/tree-sitter-carve"
-            exit 1
-          fi
-          if ! git -C tree-sitter-carve merge-base --is-ancestor "${rev}" origin/main; then
-            echo "::error::grammar ${rev} is not on main, so the pin came from an unmerged or rewritten branch"
-            exit 1
-          fi
-          behind="$(git -C tree-sitter-carve rev-list --count "${rev}..origin/main")"
-          echo "grammar pin: ${rev} ($(git -C tree-sitter-carve log -1 --format=%s "${rev}"))"
-          echo "tree-sitter-carve main is ${behind} commit(s) ahead"
-          if [ "${behind}" -gt 0 ]; then
-            echo "::error::the grammar pin ${rev} is ${behind} commit(s) behind tree-sitter-carve main $(git -C tree-sitter-carve rev-parse origin/main); re-vendor the grammar"
-            exit 1
-          fi
+        run: sh scripts/check-grammar-pin.sh tree-sitter-carve "${REV_OVERRIDE}"
