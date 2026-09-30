@@ -41,7 +41,7 @@ language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "9323ff5f9d87b20372fc3f4f9052fed67dd176ff" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "8fe9f7658664bee6c49ee2956d79fd187a3a262e" }
 
 # Local (path) form -- use this for offline grammar development:
 # [[grammar]]

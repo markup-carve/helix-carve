@@ -32,6 +32,21 @@ jobs:
           done
           echo "All Helix query files present."
 
+      # The README carries a copy-paste [[grammar]] block. It was two bumps
+      # behind languages.toml, so a reader following it installed a grammar the
+      # repo had already moved off.
+      - name: The README install block pins the same rev as languages.toml
+        run: |
+          set -eu
+          toml_rev=$(grep -oE 'rev = "[0-9a-f]{40}"' languages.toml | grep -oE '[0-9a-f]{40}' | head -1)
+          readme_rev=$(grep -oE 'rev = "[0-9a-f]{40}"' README.md | grep -oE '[0-9a-f]{40}' | head -1)
+          echo "languages.toml: ${toml_rev}"
+          echo "README.md:      ${readme_rev}"
+          if [ "${toml_rev}" != "${readme_rev}" ]; then
+            echo "::error::README.md pins ${readme_rev} but languages.toml pins ${toml_rev}"
+            exit 1
+          fi
+
   grammar:
     name: Grammar parses sample files
     runs-on: ubuntu-latest
@@ -114,3 +129,22 @@ jobs:
           # tree-sitter parse exits nonzero if any file yields ERROR/MISSING nodes.
           tree-sitter parse --quiet $files
           echo "All sample files parsed without errors."
+
+  grammar-pin:
+    name: Grammar pin is current with tree-sitter-carve main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Check out the grammar
+        uses: actions/checkout@v7
+        with:
+          repository: markup-carve/tree-sitter-carve
+          path: tree-sitter-carve
+          fetch-depth: 0
+
+      # The same check the scheduled Grammar drift job runs. It runs here too
+      # because a schedule-only check goes red without a commit, so no pull
+      # request shows it: this one sat red for a week unread.
+      - name: Compare the pinned revision against tree-sitter-carve main
+        run: sh scripts/check-grammar-pin.sh tree-sitter-carve
