@@ -34,6 +34,17 @@ behind="$(git -C "${grammar_dir}" rev-list --count "${rev}..origin/main")"
 echo "grammar pin: ${rev} ($(git -C "${grammar_dir}" log -1 --format=%s "${rev}"))"
 echo "tree-sitter-carve main is ${behind} commit(s) ahead"
 
+# The drift job re-vendors instead of failing, so it asks for the numbers.
+# The pull-request gate leaves PIN_REPORT unset and still fails when behind.
+if [ -n "${PIN_REPORT:-}" ]; then
+  {
+    echo "rev=${rev}"
+    echo "behind=${behind}"
+    echo "head=$(git -C "${grammar_dir}" rev-parse origin/main)"
+  } >> "${PIN_REPORT}"
+  exit 0
+fi
+
 if [ "${behind}" -gt 0 ]; then
   echo "::error::the grammar pin ${rev} is ${behind} commit(s) behind tree-sitter-carve main $(git -C "${grammar_dir}" rev-parse origin/main); re-vendor the grammar"
   exit 1
