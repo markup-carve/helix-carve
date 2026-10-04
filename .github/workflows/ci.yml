@@ -133,23 +133,3 @@ jobs:
           # tree-sitter parse exits nonzero if any file yields ERROR/MISSING nodes.
           tree-sitter parse --quiet $files
           echo "All sample files parsed without errors."
-
-  grammar-pin:
-    name: Grammar pin is current with tree-sitter-carve main
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v7
-
-      - name: Check out the grammar
-        uses: actions/checkout@v7
-        with:
-          repository: markup-carve/tree-sitter-carve
-          path: tree-sitter-carve
-          fetch-depth: 0
-
-      # The same check the scheduled Grammar drift job runs. It runs here too
-      # because a schedule-only check goes red without a commit, so no pull
-      # request shows it: this one sat red for a week unread.
-      - name: Compare the pinned revision against tree-sitter-carve main
-        run: sh scripts/check-grammar-pin.sh tree-sitter-carve
