@@ -59,7 +59,7 @@ jobs:
         run: PIN_REPORT="$GITHUB_OUTPUT" sh scripts/check-grammar-pin.sh tree-sitter-carve "${REV_OVERRIDE}"
 
       - name: Open or update the re-vendor pull request
-        if: steps.pin.outputs.behind != '0' && inputs.rev == ''
+        if: steps.pin.outputs.behind != '0' && inputs.rev == '' && github.ref_name == github.event.repository.default_branch
         env:
           GH_TOKEN: ${{ secrets.BUMP_TOKEN }}
           REPO: ${{ github.repository }}
@@ -75,13 +75,16 @@ jobs:
           fi
           branch=automation/revendor-grammar
           short="${NEW:0:7}"
+          remote="https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
 
-          # An open pull request already carrying this revision needs nothing;
-          # pushing again would only restart its CI.
-          if git ls-remote --exit-code "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "refs/heads/${branch}" >/dev/null; then
-            git fetch -q "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "${branch}"
+          # An OPEN pull request already carrying this revision needs nothing;
+          # pushing again would only restart its CI. A branch without an open
+          # pull request (closed, or a create that failed) is pushed again.
+          pr="$(gh pr list --repo "${REPO}" --head "${branch}" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "${pr}" ]; then
+            git fetch -q "${remote}" "${branch}"
             if git show FETCH_HEAD:languages.toml | grep -q "${NEW}"; then
-              echo "${branch} already pins ${NEW}; nothing to do."
+              echo "#${pr} already pins ${NEW}; nothing to do."
               exit 0
             fi
           fi
@@ -91,7 +94,7 @@ jobs:
           git checkout -q -B "${branch}"
           sed -i "s/${OLD}/${NEW}/g" languages.toml README.md
           git commit -q -am "chore: move the grammar pin to tree-sitter-carve ${short}"
-          git push -q --force "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git" "${branch}"
+          git push -q --force "${remote}" "${branch}"
 
           {
             echo "Moves the \`languages.toml\` grammar pin from \`${OLD:0:7}\` to tree-sitter-carve main \`${short}\`, ${BEHIND} commit(s) ahead."
