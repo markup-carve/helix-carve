@@ -59,6 +59,7 @@ jobs:
         run: PIN_REPORT="$GITHUB_OUTPUT" sh scripts/check-grammar-pin.sh tree-sitter-carve "${REV_OVERRIDE}"
 
       - name: Open or update the re-vendor pull request
+        id: revendor
         if: steps.pin.outputs.behind != '0' && inputs.rev == '' && github.ref_name == github.event.repository.default_branch
         env:
           GH_TOKEN: ${{ secrets.BUMP_TOKEN }}
@@ -118,3 +119,31 @@ jobs:
               --title "${title}" --body-file "${RUNNER_TEMP}/body.md" \
               --label chore --label area:grammar --label area:editor
           fi
+
+      # main requires its checks and an up-to-date branch, so auto-merge waits for
+      # this repo's CI. GitHub never updates a BEHIND branch itself, so do it here.
+      - name: Merge the re-vendor pull request once its checks pass
+        if: steps.revendor.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ secrets.BUMP_TOKEN }}
+          REPO: ${{ github.repository }}
+          BRANCH: automation/revendor-grammar
+        run: |
+          set -euo pipefail
+          pr="$(gh pr list --repo "${REPO}" --head "${BRANCH}" --state open --json number --jq '.[0].number // empty')"
+          if [ -z "${pr}" ]; then
+            echo "No open re-vendor pull request."
+            exit 0
+          fi
+          state=UNKNOWN
+          for _ in 1 2 3 4 5; do
+            state="$(gh pr view "${pr}" --repo "${REPO}" --json mergeStateStatus --jq .mergeStateStatus)"
+            [ "${state}" = UNKNOWN ] || break
+            sleep 5
+          done
+          if [ "${state}" = BEHIND ]; then
+            gh api "repos/${REPO}/pulls/${pr}/update-branch" -X PUT --silent
+            echo "Updated #${pr} onto the default branch."
+          fi
+          gh pr merge "${pr}" --repo "${REPO}" --squash --auto
+          echo "Auto-merge (squash) enabled on #${pr}."
