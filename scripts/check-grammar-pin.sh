@@ -1,9 +1,8 @@
 #!/usr/bin/env sh
 # Compare the languages.toml grammar pin against tree-sitter-carve main.
 #
-# Called from both the scheduled drift job and the pull-request gate: a
-# schedule-only check can go red for a week without any pull request showing
-# it, which is how the pin sat 32 commits behind while every gate was green.
+# Called from the scheduled drift job, which opens a re-vendor pull request
+# when the pin is behind instead of failing pull requests.
 #
 # Usage: check-grammar-pin.sh <tree-sitter-carve checkout> [rev override]
 set -eu
