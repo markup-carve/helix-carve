@@ -270,6 +270,49 @@ const CASES = [
         expect: 'label',
     },
     /*
+     * An option marker may touch what precedes it (markup-carve/carve#2775).
+     * Each glued form is its own token run, and the grammar read none of them
+     * as a directive before tree-sitter-carve#525 - the third spelling below
+     * returned a `tag` node for its selector, painting part of a directive in
+     * tag colors. The padded forms above cannot see any of that.
+     */
+    {
+        name: 'an option glued to the path is still a parameter',
+        source: 'See {{ ch.crv@shift:auto }} here.\n',
+        at: [0, 13],
+        expect: 'variable.parameter',
+    },
+    {
+        name: "a glued option's value is still a constant",
+        source: 'See {{ ch.crv@shift:auto }} here.\n',
+        at: [0, 20],
+        expect: 'constant',
+    },
+    {
+        name: 'a glued selector followed by a glued option is still a section',
+        source: 'See {{ ch.crv#Intro@shift:auto }} here.\n',
+        at: [0, 13],
+        expect: 'label',
+    },
+    {
+        name: 'an option glued to a glued selector is still a parameter',
+        source: 'See {{ ch.crv#Intro@shift:auto }} here.\n',
+        at: [0, 19],
+        expect: 'variable.parameter',
+    },
+    {
+        name: 'a padded selector followed by a glued option is a label, NOT a tag',
+        source: 'See {{ ch.crv #Intro@shift:auto }} here.\n',
+        at: [0, 14],
+        expect: 'label',
+    },
+    {
+        name: 'an option glued to a padded selector is still a parameter',
+        source: 'See {{ ch.crv #Intro@shift:auto }} here.\n',
+        at: [0, 20],
+        expect: 'variable.parameter',
+    },
+    /*
      * Control: a `#tag` that is NOT inside a directive keeps the tag color, so
      * the rows above cannot pass by the tag pattern having been deleted.
      */
