@@ -49,7 +49,7 @@ indent = { tab-width = 2, unit = "  " }
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "3d683213b504027ec28ea4e976978b96bf280b45" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "56bb78f68c2d6714358b9432b4fd653fb5993e75" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
