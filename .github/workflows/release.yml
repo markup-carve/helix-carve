@@ -1,0 +1,352 @@
+name: Release
+
+# THE TAG IS CREATED HERE, AFTER THE GATES PASS AND AFTER A HUMAN APPROVES.
+#
+# NOTHING IS PUBLISHED TO A REGISTRY, and that is not an omission. Helix has no
+# package manager for language support: a reader copies the [[language]] and
+# [[grammar]] blocks out of languages.toml and the query files out of
+# runtime/queries/carve/, which is why the README install block carrying the same
+# grammar rev is a gate below rather than a nicety. So the release IS the tag
+# plus the release page, and the tag is the first and only irreversible act.
+#
+# Every job declares timeout-minutes, so a hung step fails in minutes instead of
+# inheriting GitHub's 360-minute default.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release, without a leading v (e.g. 0.1.6)'
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ inputs.version }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    name: The version surfaces agree and the tag is free
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+    steps:
+      # fetch-depth: 0 for the tags: the check below asks whether a ref exists,
+      # and a shallow clone carries none of them.
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: The tag does not exist yet
+        env:
+          VER: ${{ inputs.version }}
+        run: |
+          case "$VER" in
+            ""|v*|*[!0-9A-Za-z.+-]*)
+              echo "::error::[$VER] is not a bare version. This repository tags bare, so pass 0.1.6."
+              exit 1
+              ;;
+          esac
+          if git rev-parse -q --verify "refs/tags/${VER}" >/dev/null; then
+            echo "::error::Tag ${VER} already exists. Supersede it with a new version instead."
+            exit 1
+          fi
+          echo "${VER} is free"
+
+      # CHANGELOG.md is the ONLY place this repository states a version. There is
+      # no manifest: languages.toml carries a grammar rev rather than a version,
+      # and nothing in runtime/queries names one. Grepped before writing this, so
+      # the single surface below is the complete set rather than the easy one.
+      #
+      # A DATED section, not merely a heading. An undated one is the shape a cut
+      # leaves behind when the section was opened and never written, and it reads
+      # as released while saying nothing.
+      - name: CHANGELOG.md has a dated section for this version
+        env:
+          VER: ${{ inputs.version }}
+        run: |
+          count="$(grep -cE "^## \[?${VER//./\\.}\]? - [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md || true)"
+          if [ "$count" != "1" ]; then
+            echo "::error::CHANGELOG.md needs exactly one dated section for ${VER}, found ${count}"
+            grep -nE '^## ' CHANGELOG.md
+            exit 1
+          fi
+
+      # A released section with nothing under it describes nothing. This counts
+      # the lines between this version's heading and the next one.
+      - name: That section describes something
+        env:
+          VER: ${{ inputs.version }}
+        run: |
+          body="$(awk -v v="## [${VER}]" '
+            index($0, v) == 1 { on = 1; next }
+            on && /^## / { exit }
+            on { print }' CHANGELOG.md | grep -c '[^[:space:]]' || true)"
+          echo "the ${VER} section holds ${body} non-blank lines"
+          if [ "${body:-0}" -lt 2 ]; then
+            echo "::error::the ${VER} section in CHANGELOG.md is empty."
+            exit 1
+          fi
+
+  release-notes:
+    name: A release draft for this version exists and has notes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      # `write`, not `read`: a DRAFT release is invisible to a caller without
+      # push access, so under `contents: read` the listing comes back empty and
+      # this gate reports "no release" for a draft sitting right there with
+      # notes in it. See markup-carve/carve-wasm#80.
+      contents: write
+    steps:
+      # Found by LISTING rather than by `gh release view <tag>`: a draft's tag is
+      # not a git ref, so addressing one by tag can match nothing, change nothing
+      # and still exit 0.
+      - name: The draft exists and has notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ inputs.version }}
+        run: |
+          set -uo pipefail
+          release="$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq "[.[] | select(.tag_name == \"${VER}\")] | first")"
+          if [ -z "$release" ]; then
+            echo "::error::no release for ${VER}. Write the notes first:" \
+                 "gh release create ${VER} --draft --notes-file notes.md"
+            echo "::error::if a draft DOES exist, this job could not see it -" \
+                 "check that it still declares contents: write"
+            exit 1
+          fi
+          body="$(printf '%s' "$release" | jq -r '.body // ""')"
+          printf '%s' "$release" | jq -r '"draft=\(.draft) tag=\(.tag_name)"'
+          if [ "${#body}" -lt 40 ]; then
+            echo "::error::the release for ${VER} carries ${#body} characters of notes." \
+                 "That is not a description of a release."
+            exit 1
+          fi
+          echo "notes: ${#body} characters"
+
+  config:
+    name: The config a reader copies is valid and self-consistent
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: languages.toml parses
+        run: |
+          python - <<'PY'
+          import tomllib
+          with open("languages.toml", "rb") as handle:
+              tomllib.load(handle)
+          print("OK: languages.toml is valid TOML")
+          PY
+
+      - name: Every Helix query file is present and non-empty
+        run: |
+          for q in highlights indents injections textobjects; do
+            test -s "runtime/queries/carve/$q.scm" \
+              || { echo "::error::missing or empty runtime/queries/carve/$q.scm"; exit 1; }
+          done
+          echo "all Helix query files present"
+
+      # The README carries a copy-paste [[grammar]] block, and it has been two
+      # bumps behind languages.toml before now - so a reader following it
+      # installed a grammar the repository had already moved off. On a release
+      # that mismatch is what ships.
+      - name: The README install block pins the same rev as languages.toml
+        run: |
+          set -eu
+          toml_rev=$(grep -oE 'rev = "[0-9a-f]{40}"' languages.toml | grep -oE '[0-9a-f]{40}' | head -1)
+          readme_rev=$(grep -oE 'rev = "[0-9a-f]{40}"' README.md | grep -oE '[0-9a-f]{40}' | head -1)
+          echo "languages.toml: ${toml_rev}"
+          echo "README.md:      ${readme_rev}"
+          if [ "${toml_rev}" != "${readme_rev}" ]; then
+            echo "::error::README.md pins ${readme_rev} but languages.toml pins ${toml_rev}"
+            exit 1
+          fi
+
+      - name: Check out tree-sitter-carve
+        uses: actions/checkout@v7
+        with:
+          repository: markup-carve/tree-sitter-carve
+          path: tree-sitter-carve
+          fetch-depth: 0
+
+      # The pinned rev must be a commit that is ON tree-sitter-carve main. A pin
+      # taken from an unmerged or rewritten branch builds here, because the
+      # commit is still fetchable, and stops building for a reader the moment the
+      # branch is deleted. The repository's own script makes that judgement.
+      - name: The grammar pin is a commit on tree-sitter-carve main
+        run: ./scripts/check-grammar-pin.sh tree-sitter-carve
+
+  grammar:
+    name: The queries highlight what the pinned grammar parses
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install the tree-sitter CLI
+        # Pinned to the 0.26 minor: validated against this grammar repo's layout
+        # (tree-sitter.json config, committed src/parser.c).
+        run: npm install -g tree-sitter-cli@0.26
+
+      - name: Extract the pinned grammar rev from languages.toml
+        id: grammar-rev
+        run: |
+          rev=$(sed -n 's/.*rev = "\([0-9a-f]\{40\}\)".*/\1/p' languages.toml | head -n1)
+          if [ -z "$rev" ]; then
+            echo "::error::could not extract a grammar rev from languages.toml"
+            exit 1
+          fi
+          echo "pinned tree-sitter-carve rev: $rev"
+          echo "rev=$rev" >> "$GITHUB_OUTPUT"
+
+      - name: Clone tree-sitter-carve at the pinned rev
+        run: |
+          git clone https://github.com/markup-carve/tree-sitter-carve "$RUNNER_TEMP/tree-sitter-carve"
+          git -C "$RUNNER_TEMP/tree-sitter-carve" checkout "${{ steps.grammar-rev.outputs.rev }}"
+
+      - name: Build the grammar
+        # src/parser.c is committed upstream, so no `tree-sitter generate` needed.
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: tree-sitter build
+
+      # A query naming a node the grammar does not have captures nothing and
+      # highlights nothing, while the file still exists and is non-empty - so the
+      # presence check in `config` passes and the editor quietly shows plain
+      # text. `tree-sitter query` rejects an unknown node type, which is the only
+      # thing that can tell the two apart.
+      - name: The queries reference nodes the pinned grammar has
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: |
+          sample="$RUNNER_TEMP/query-probe.crv"
+          printf '# H\n\n- item\n\n> quote\n' > "$sample"
+          failed=0
+          for q in "$GITHUB_WORKSPACE"/runtime/queries/carve/*.scm; do
+            if tree-sitter query "$q" "$sample" >/dev/null; then
+              echo "OK   $(basename "$q")"
+            else
+              echo "FAIL $(basename "$q")"
+              failed=1
+            fi
+          done
+          exit "$failed"
+
+      # Compiling a query only proves its node names exist. Several patterns
+      # claim the same node and only one color reaches the screen, so a pattern
+      # that never wins is indistinguishable from a pattern that is absent, and
+      # both stay green above. This resolves what Helix would actually paint.
+      - name: Resolve the effective highlight captures
+        working-directory: ${{ github.workspace }}
+        env:
+          TS_CWD: ${{ runner.temp }}/tree-sitter-carve
+        run: node scripts/highlight-captures.mjs
+
+      - name: The sample documents parse without errors
+        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        run: |
+          files=$(find "$GITHUB_WORKSPACE" -name '*.crv' -not -path '*/.git/*' | sort)
+          if [ -z "$files" ]; then
+            echo "::error::no .crv sample files found in the repository"
+            exit 1
+          fi
+          echo "parsing:"
+          echo "$files"
+          # tree-sitter parse exits nonzero if any file yields ERROR/MISSING nodes.
+          tree-sitter parse --quiet $files
+          echo "all sample files parsed without errors"
+
+  tag:
+    name: Create the tag
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [guard, release-notes, config, grammar]
+    # THE APPROVAL GATE, and the ONLY job that carries an environment. GitHub
+    # prompts once per gated JOB, so a second one would ask twice for one
+    # decision, and the second prompt would arrive after the tag already existed
+    # and so could withhold nothing.
+    environment: release-approval
+    permissions:
+      # Without this the push 403s AFTER the approval has been spent.
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Push the tag
+        env:
+          VER: ${{ inputs.version }}
+        run: |
+          # Re-checked under the approval: `main` can move while a run waits for
+          # a reviewer, and the gates measured the commit that was current then.
+          count="$(grep -cE "^## \[?${VER//./\\.}\]? - [0-9]{4}-[0-9]{2}-[0-9]{2}" CHANGELOG.md || true)"
+          if [ "$count" != "1" ]; then
+            echo "::error::CHANGELOG.md no longer carries exactly one dated ${VER} section."
+            echo "::error::main moved while this run waited for approval. Re-run the workflow."
+            exit 1
+          fi
+          if git rev-parse -q --verify "refs/tags/${VER}" >/dev/null; then
+            echo "::error::Tag ${VER} appeared while this run waited for approval. Stopping."
+            exit 1
+          fi
+          git tag "$VER" "$GITHUB_SHA"
+          git push origin "refs/tags/${VER}"
+          echo "tagged ${VER} at $GITHUB_SHA"
+
+  publish:
+    name: Publish the release notes
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [tag]
+    # NO `environment:` here - see the comment on `tag`. `needs: [tag]` already
+    # makes this unreachable without the approval.
+    permissions:
+      contents: write
+    steps:
+      # There is no registry step: a Helix user copies config out of this
+      # repository. What is left is the release page, which is where the notes
+      # for the version a reader just copied live.
+      - name: Un-draft the release for this version
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ inputs.version }}
+        run: |
+          set -uo pipefail
+          id="$(gh api "repos/$GITHUB_REPOSITORY/releases" --paginate \
+            --jq "[.[] | select(.tag_name == \"${VER}\" and .draft)] | first | .id // empty")"
+          if [ -z "$id" ]; then
+            echo "No draft release for ${VER}; nothing to publish."
+            exit 0
+          fi
+          # `tag_name` goes with every PATCH of a release. Omit it on a DRAFT and
+          # GitHub replaces the tag with a generated `untagged-*` placeholder,
+          # because a draft's tag is a string on the object rather than a git
+          # ref. `-F` (not `-f`) for draft, so it is sent as a boolean: the
+          # string "false" is truthy and would publish anyway.
+          gh api "repos/$GITHUB_REPOSITORY/releases/$id" -X PATCH \
+            -f tag_name="$VER" -F draft=false --jq '"published \(.tag_name)"'
+          # Read it back: an exit status does not tell you whether the tag survived.
+          gh api "repos/$GITHUB_REPOSITORY/releases/$id" \
+            --jq '"draft=\(.draft) tag=\(.tag_name)"'
