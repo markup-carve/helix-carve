@@ -76,7 +76,3 @@
   (key)
   (value)
 ] @parameter.inside
-
-; Comments.
-(comment
-  (content) @comment.inside) @comment.around
