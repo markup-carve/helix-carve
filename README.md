@@ -123,9 +123,8 @@ actions need a carve-lsp release newer than 0.1.7.
 ### Import from Markdown or HTML
 
 Converting the other way uses `carve migrate`, which prints the Carve source to
-stdout. It needs the `carve` CLI on PATH, for example from `cargo install
-carve-lang`. The npm package does not work for this yet: `npx` and its
-installed `carve` exit without output until a carve-js entry-point bug is fixed.
+stdout. It needs the `carve` CLI on PATH, installed with
+`npm install -g @markup-carve/carve` or `cargo install carve-lang`.
 
 From Helix, with the `.md` file open:
 
