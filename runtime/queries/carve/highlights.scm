@@ -109,19 +109,14 @@
 [
   (list_marker_decimal_period)
   (list_marker_decimal_paren)
-  (list_marker_decimal_parens)
   (list_marker_lower_alpha_period)
   (list_marker_lower_alpha_paren)
-  (list_marker_lower_alpha_parens)
   (list_marker_upper_alpha_period)
   (list_marker_upper_alpha_paren)
-  (list_marker_upper_alpha_parens)
   (list_marker_lower_roman_period)
   (list_marker_lower_roman_paren)
-  (list_marker_lower_roman_parens)
   (list_marker_upper_roman_period)
   (list_marker_upper_roman_paren)
-  (list_marker_upper_roman_parens)
 ] @markup.list.numbered
 
 ; A definition list is two markers, not one: `::` opens the term and `:` opens
@@ -266,10 +261,6 @@
   (braced_comment)
   (trailing_comment)
 ] @comment
-
-(todo) @comment.warning
-(note) @comment.note
-(fixme) @comment.error
 
 ; --- Spans / attributes -------------------------------------------------------
 (span

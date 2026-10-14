@@ -3,6 +3,22 @@
 ; Inject the embedded language for fenced code, raw blocks, inline raw, math,
 ; and frontmatter so Helix highlights them with the target grammar.
 
+; TODO, NOTE and FIXME are marked inside comments only, by Helix's `comment`
+; grammar. In prose the engine renders them as plain words.
+([
+  (comment_line)
+  (trailing_comment)
+] @injection.content
+  (#set! injection.language "comment"))
+
+([
+  (fenced_comment_block
+    (content) @injection.content)
+  (braced_comment
+    (content) @injection.content)
+]
+  (#set! injection.language "comment"))
+
 (math
   (content) @injection.content
   (#set! injection.language "latex"))
@@ -24,3 +40,9 @@
 (frontmatter
   (language) @injection.language
   (frontmatter_content) @injection.content)
+
+; Plain `---` frontmatter is YAML.
+(frontmatter
+  !language
+  (frontmatter_content) @injection.content
+  (#set! injection.language "yaml"))

@@ -24,6 +24,8 @@ args = ["--stdio"]
 name = "carve"
 scope = "source.carve"
 file-types = ["crv"]
+# Lets a Markdown fence labeled `carve` or `crv` highlight as Carve.
+injection-regex = "^(carve|crv)$"
 # `.git` rather than empty: rename, find-references and go-to-definition are
 # WORKSPACE-wide in carve-lsp - a heading id renamed in one file updates every
 # `</#id>` that points at it - and a server given no root can only see the open
@@ -41,7 +43,7 @@ language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "c22272bc7379200b960ea8865ffe5205e61a2c85" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "31cabddde6d758793e4bfcb2361591c26beefc41" }
 
 # Local (path) form -- use this for offline grammar development:
 # [[grammar]]
