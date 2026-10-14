@@ -8,6 +8,8 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-14
+
 ### Fixed
 
 - `TODO`, `NOTE` and `FIXME` are marked only inside `%%`, `%%%` and `{% %}`
@@ -16,10 +18,11 @@ Releases before 0.1.5 are described on the
 - Plain `---` front matter is highlighted as YAML, as upstream does.
 - A Markdown fence labeled `carve` or `crv` highlights its body as Carve.
 - The README install snippet matches `languages.toml`: `roots = [".git"]` and
-  the `carve-lsp` language server.
+  the `carve-lsp` language server (#52).
 
-These come with the grammar pin moving from tree-sitter-carve `c22272b` to
-`31cabdd`:
+These come with the grammar pin moving from tree-sitter-carve `3d68321` to
+the 0.1.9 tag (`54289cd`), in #47, #48, #49, #52 and #53. Highlighting
+follows the grammar, so that is where they come from.
 
 - Block structure around quoted lists, comments, fences, tables, line blocks,
   continuation markers and lazy lines follows the engine
@@ -36,19 +39,6 @@ These come with the grammar pin moving from tree-sitter-carve `c22272b` to
   braced span stays open across a bracket that holds its closer
   (markup-carve/tree-sitter-carve#544,
   markup-carve/tree-sitter-carve#553).
-
-### Changed
-
-- The highlights query drops the five `list_marker_*_parens` patterns, which
-  name markers the grammar never produces.
-
-## [0.1.6] - 2026-10-14
-
-### Fixed
-
-These come with the grammar pin moving from tree-sitter-carve `3d68321` to
-0.1.9 (`c22272b`), in #47, #48, #49 and this release. Highlighting follows the
-grammar, so that is where they come from.
 
 - An include option glued to the next one, such as
   `{{ c.crv@shift:1@lines:1-2 }}`, reads as two options, and an option with
@@ -68,6 +58,8 @@ grammar, so that is where they come from.
 
 ### Changed
 
+- The highlights query drops the five `list_marker_*_parens` patterns, which
+  name markers the grammar never produces (#52).
 - The queries drop the `comment` node, which tree-sitter-carve removed with
   the Djot `%comment%` attribute item, including its comment textobject, so
   the patterns that named it would no longer compile
