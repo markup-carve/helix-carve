@@ -8,6 +8,40 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+### Fixed
+
+- `TODO`, `NOTE` and `FIXME` are marked only inside `%%`, `%%%` and `{% %}`
+  comments, through Helix's `comment` grammar. In prose the engine renders
+  them as plain words, so they are no longer highlighted there.
+- Plain `---` front matter is highlighted as YAML, as upstream does.
+- A Markdown fence labeled `carve` or `crv` highlights its body as Carve.
+- The README install snippet matches `languages.toml`: `roots = [".git"]` and
+  the `carve-lsp` language server.
+
+These come with the grammar pin moving from tree-sitter-carve `c22272b` to
+`31cabdd`:
+
+- Block structure around quoted lists, comments, fences, tables, line blocks,
+  continuation markers and lazy lines follows the engine
+  (markup-carve/tree-sitter-carve#539, markup-carve/tree-sitter-carve#542,
+  markup-carve/tree-sitter-carve#546, markup-carve/tree-sitter-carve#551,
+  markup-carve/tree-sitter-carve#555).
+- Long paragraphs and lines parse in near-linear time, and a stale delimiter
+  note no longer hangs the parser (markup-carve/tree-sitter-carve#545,
+  markup-carve/tree-sitter-carve#547).
+- Very wide colon, code and comment fences are read at full width
+  (markup-carve/tree-sitter-carve#547, markup-carve/tree-sitter-carve#548,
+  markup-carve/tree-sitter-carve#549).
+- Citation, comment, column and quote-cap readings follow the engine, and a
+  braced span stays open across a bracket that holds its closer
+  (markup-carve/tree-sitter-carve#544,
+  markup-carve/tree-sitter-carve#553).
+
+### Changed
+
+- The highlights query drops the five `list_marker_*_parens` patterns, which
+  name markers the grammar never produces.
+
 ## [0.1.6] - 2026-10-14
 
 ### Fixed

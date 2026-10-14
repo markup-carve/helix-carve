@@ -17,7 +17,8 @@ extension.
 - Textobjects (`function`, `class`, `parameter`, `entry`, `comment`) for
   tree-sitter based selection and navigation.
 - Language injections so fenced code blocks, raw blocks, inline raw spans, math
-  (LaTeX), and frontmatter are highlighted with their target grammar.
+  (LaTeX), and frontmatter are highlighted with their target grammar, and
+  `TODO`, `NOTE` and `FIXME` are marked inside comments.
 - A `%%` comment token, so `gc` comment toggling works.
 - Language-server support via
   [carve-lsp](https://github.com/markup-carve/carve-lsp) - diagnostics, hover,
@@ -34,22 +35,28 @@ differs from the Neovim-flavored captures the upstream grammar ships.
 
 ### 1. Merge the language and grammar definitions
 
-Copy the `[[language]]` and `[[grammar]]` entries from this repo's
-[`languages.toml`](languages.toml) into your Helix `languages.toml`
-(`~/.config/helix/languages.toml`):
+Copy the `[language-server.carve-lsp]`, `[[language]]` and `[[grammar]]`
+entries from this repo's [`languages.toml`](languages.toml) into your Helix
+`languages.toml` (`~/.config/helix/languages.toml`):
 
 ```toml
+[language-server.carve-lsp]
+command = "carve-lsp"
+args = ["--stdio"]
+
 [[language]]
 name = "carve"
 scope = "source.carve"
 file-types = ["crv"]
-roots = []
+injection-regex = "^(carve|crv)$"
+roots = [".git"]
 comment-token = "%%"
 indent = { tab-width = 2, unit = "  " }
+language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "c22272bc7379200b960ea8865ffe5205e61a2c85" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "31cabddde6d758793e4bfcb2361591c26beefc41" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
@@ -158,7 +165,7 @@ helix-carve/
 │   └── queries/
 │       └── carve/
 │           ├── highlights.scm     # Helix-flavored scopes; correct h1-h6 mapping
-│           ├── injections.scm     # code / raw / math / frontmatter injections
+│           ├── injections.scm     # code / raw / math / frontmatter / comment injections
 │           ├── textobjects.scm    # function/class/parameter/entry/comment
 │           └── indents.scm        # container-based indent scopes
 ├── scripts/
