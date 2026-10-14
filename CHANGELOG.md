@@ -8,6 +8,37 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-14
+
+### Fixed
+
+These come with the grammar pin moving from tree-sitter-carve `3d68321` to
+0.1.9 (`c22272b`), in #47, #48, #49 and this release. Highlighting follows the
+grammar, so that is where they come from.
+
+- An include option glued to the next one, such as
+  `{{ c.crv@shift:1@lines:1-2 }}`, reads as two options, and an option with
+  no value, such as `{{ c.crv @k }}`, no longer breaks the directive
+  (markup-carve/tree-sitter-carve#533, markup-carve/tree-sitter-carve#534).
+- A table row splits around escapes the way the engine does: an escaped tick
+  opens no code run (markup-carve/tree-sitter-carve#528).
+- A standalone caption detaches after two blank lines, email autolinks such as
+  `<a@b.com>` are recognized, and the Djot quote forms `{"` and `"}` stay text
+  (markup-carve/tree-sitter-carve#540).
+- Inline extensions whose name starts with an underscore are read, an
+  abbreviation definition can interrupt a paragraph, and tab padding inside
+  inline attribute blocks is refused (markup-carve/tree-sitter-carve#540,
+  markup-carve/tree-sitter-carve#541).
+- The nesting cap of 200 covers quotes, lists, colon fences and footnotes
+  together, and `[t][@a]` stays text (markup-carve/tree-sitter-carve#541).
+
+### Changed
+
+- The queries drop the `comment` node, which tree-sitter-carve removed with
+  the Djot `%comment%` attribute item, including its comment textobject, so
+  the patterns that named it would no longer compile
+  (markup-carve/tree-sitter-carve#541).
+
 ## [0.1.5] - 2026-10-08
 
 ### Added

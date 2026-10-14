@@ -263,7 +263,6 @@
 [
   (comment_line)
   (fenced_comment_block)
-  (comment)
   (braced_comment)
   (trailing_comment)
 ] @comment
