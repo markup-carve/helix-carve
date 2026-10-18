@@ -14,7 +14,7 @@ Releases before 0.1.5 are described on the
 
 - Color reserved `kbd`, `abbr` and `time` keys on spans, `table` above CSV or TSV fences, and `loose` above lists. Quoted and stacked block attributes keep the same colors (#55).
 - Inject CSV and TSV into delimited table code. A delimited table textobject selects the code body once; pipe table rows and captions keep their selections (#55).
-- Pin tree-sitter-carve at `fd44e74`, including the Carve 0.1.10 corpus, CSV/TSV table nodes, and the parser fixes from markup-carve/tree-sitter-carve#559, markup-carve/tree-sitter-carve#563, and markup-carve/tree-sitter-carve#568 (#54, #56, #55).
+- Pin tree-sitter-carve at `fd44e74`, including the Carve 0.1.10 corpus, CSV/TSV table nodes, and the parser fixes from markup-carve/tree-sitter-carve#559, markup-carve/tree-sitter-carve#563, and markup-carve/tree-sitter-carve#568 (#54, #56, #55, #58).
 
 ## [0.1.6] - 2026-10-14
 
