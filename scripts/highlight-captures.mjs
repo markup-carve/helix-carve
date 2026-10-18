@@ -54,6 +54,14 @@ const NOT_A_COLOR = new Set(['none', 'conceal', 'spell', 'nospell']);
  * same-looking kind words gets which color.
  */
 const CASES = [
+    { name: 'kbd on a span', source: '[Tab]{kbd}\n', at: [0, 6], expect: 'attribute.builtin' },
+    { name: 'abbr on a span', source: '[ABC]{abbr=ABC}\n', at: [0, 6], expect: 'attribute.builtin' },
+    { name: 'time on a span', source: '[10:00]{time=10:00}\n', at: [0, 8], expect: 'attribute.builtin' },
+    { name: 'kbd above prose', source: '{kbd}\ntext\n', at: [0, 1], expect: 'attribute' },
+    { name: 'table above CSV', source: '{table}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table above prose', source: '{table}\ntext\n', at: [0, 1], expect: 'attribute' },
+    { name: 'loose above a list', source: '{loose}\n- item\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'loose above prose', source: '{loose}\ntext\n', at: [0, 1], expect: 'attribute' },
     {
         name: 'a bare figure opener is a composite figure',
         source: '::: figure\n![one](a.png)\n^ (a) One\n:::\n^ Figure #: Group caption\n',

@@ -318,6 +318,30 @@
 
 (boolean_attribute) @attribute
 
+; Reserved words take their special meaning only in these positions.
+((span
+  attribute: (inline_attribute
+    (args (boolean_attribute) @attribute.builtin)))
+  (#eq? @attribute.builtin "kbd"))
+
+((span
+  attribute: (inline_attribute
+    (args (key_value key: (key) @attribute.builtin))))
+  (#any-of? @attribute.builtin "abbr" "time"))
+
+((_
+  (block_attribute args: (args (boolean_attribute) @attribute.builtin))
+  . (block_attribute)*
+  . (code_block language: (language) @_language))
+  (#eq? @attribute.builtin "table")
+  (#any-of? @_language "csv" "tsv"))
+
+((_
+  (block_attribute args: (args (boolean_attribute) @attribute.builtin))
+  . (block_attribute)*
+  . [(list) (definition_list)])
+  (#eq? @attribute.builtin "loose"))
+
 ; The language attribute: `{:fr}`, `{:zh-Hant}` (markup-carve/carve#1114).
 (language_attribute) @attribute
 
