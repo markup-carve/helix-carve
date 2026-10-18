@@ -62,6 +62,12 @@ const CASES = [
     { name: 'table above prose', source: '{table}\ntext\n', at: [0, 1], expect: 'attribute' },
     { name: 'loose above a list', source: '{loose}\n- item\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'loose above prose', source: '{loose}\ntext\n', at: [0, 1], expect: 'attribute' },
+    { name: 'table through another attribute', source: '{table}\n{#t}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table above another language', source: '{table}\n```python\nx\n```\n', at: [0, 1], expect: 'attribute' },
+    { name: 'loose above a definition list', source: '{loose}\n:: t\n: d\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'loose through another attribute', source: '{loose}\n{.x}\n- item\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'abbr above prose', source: '{abbr=x}\ntext\n', at: [0, 1], expect: 'attribute' },
     {
         name: 'a bare figure opener is a composite figure',
         source: '::: figure\n![one](a.png)\n^ (a) One\n:::\n^ Figure #: Group caption\n',
