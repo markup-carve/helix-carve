@@ -31,7 +31,18 @@
   (_) @function.inside) @function.around
 
 (table
-  (_) @function.inside) @function.around
+  (language)
+  (code) @function.inside) @function.around
+
+(table
+  !language
+  [
+    (table_header)
+    (table_row)
+    (table_separator)
+    (table_continuation_row)
+    (table_caption)
+  ] @function.inside) @function.around
 
 (footnote
   (footnote_content) @function.inside) @function.around

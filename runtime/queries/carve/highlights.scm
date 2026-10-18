@@ -331,14 +331,14 @@
 
 ((_
   (block_attribute args: (args (boolean_attribute) @attribute.builtin))
-  . (block_attribute)*
-  . (code_block language: (language) @_language))
+  . [(block_attribute) (block_quote_marker)]*
+  . (table language: (language) @_language))
   (#eq? @attribute.builtin "table")
   (#any-of? @_language "csv" "tsv"))
 
 ((_
   (block_attribute args: (args (boolean_attribute) @attribute.builtin))
-  . (block_attribute)*
+  . [(block_attribute) (block_quote_marker)]*
   . [(list) (definition_list)])
   (#eq? @attribute.builtin "loose"))
 
