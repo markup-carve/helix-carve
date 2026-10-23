@@ -12,7 +12,7 @@ Releases before 0.1.5 are described on the
 
 ### Fixed
 
-- Pin tree-sitter-carve at `bee10ed` (its 0.1.11 release commit), which reads the `+` continuation
+- Pin tree-sitter-carve 0.1.11, which reads the `+` continuation
   marker by its owner's column per markup-carve/carve#3421: an indented or
   refused lone `+` is text, glued quote prefixes `>+`, `>>+`, `> >+` and
   `>> +` are text, and a first-block `+` in a footnote, description or
