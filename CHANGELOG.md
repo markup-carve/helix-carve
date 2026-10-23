@@ -16,7 +16,7 @@ Releases before 0.1.5 are described on the
   marker by its owner's column per markup-carve/carve#3421: an indented or
   refused lone `+` is text, glued quote prefixes `>+`, `>>+`, `> >+` and
   `>> +` are text, and a first-block `+` in a footnote, description or
-  stacked opener attaches its block (#62, #63, #64, #65).
+  stacked opener attaches its block (#62, #63, #64, #65, #67).
 - With the same pin, quote markers in nested containers match at their own
   column, list and fence ownership is read at the reached column, and a
   valueless include option parses as an option (#60, #61, #63).
@@ -24,7 +24,7 @@ Releases before 0.1.5 are described on the
 ### Improved
 
 - Color `table` as reserved above a CSV or TSV code include
-  (`{{ data.csv @code:csv }}`), which renders as a table like a CSV fence.
+  (`{{ data.csv @code:csv }}`), which renders as a table like a CSV fence (#67).
 
 ## [0.1.7] - 2026-10-18
 
