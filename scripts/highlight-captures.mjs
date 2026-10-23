@@ -68,6 +68,11 @@ const CASES = [
     { name: 'table through another attribute', source: '{table}\n{#t}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'table above another language', source: '{table}\n```python\nx\n```\n', at: [0, 1], expect: 'attribute' },
+    { name: 'table above a csv code include', source: '{table}\n{{ data.csv @code:csv }}\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table above a tsv code include', source: '{table}\n{{ data.tsv @code:tsv }}\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table above a quoted csv code include', source: '> {table}\n> {{ data.csv @code:csv }}\n', at: [0, 3], expect: 'attribute.builtin' },
+    { name: 'table above a code include of another language', source: '{table}\n{{ a.js @code:js }}\n', at: [0, 1], expect: 'attribute' },
+    { name: 'table above a plain csv include', source: '{table}\n{{ data.csv }}\n', at: [0, 1], expect: 'attribute' },
     { name: 'loose above a definition list', source: '{loose}\n:: t\n: d\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'loose through another attribute', source: '{loose}\n{.x}\n- item\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'abbr above prose', source: '{abbr=x}\ntext\n', at: [0, 1], expect: 'attribute' },
@@ -219,9 +224,10 @@ const CASES = [
 
     /*
      * THE TWO MARKERS THE PORT DROPPED. A definition list is two markers, not
-     * one, and the `+` continuation is a list marker that opens no item - so
-     * both look like ordinary prose when their capture is missing, which is
-     * how they went unnoticed while every other list marker was covered.
+     * one, and the `+` continuation opens no item - so both look like
+     * ordinary prose when their capture is missing, which is how they went
+     * unnoticed while every other list marker was covered. The `+` is an
+     * operator, as upstream captures it.
      */
     {
         name: "a definition list's description marker is painted",
@@ -230,10 +236,10 @@ const CASES = [
         expect: 'markup.list.numbered',
     },
     {
-        name: 'the list continuation marker is painted',
+        name: 'the continuation marker is painted as an operator',
         source: '- item\n+\nan attached block\n',
         at: [1, 0],
-        expect: 'markup.list',
+        expect: 'operator',
     },
 
     /*

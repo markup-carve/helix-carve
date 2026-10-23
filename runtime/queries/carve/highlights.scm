@@ -126,10 +126,9 @@
 
 (list_marker_description) @markup.list.numbered
 
-; The `+` list and block-quote continuation marker (PART 9 SS17). It attaches
-; the next flush-left block to the item above it, so it is a list marker even
-; though it opens no item of its own.
-(list_continuation_marker) @markup.list
+; The `+` continuation operator attaches the next block to its container. It is
+; an operator, not a list marker, so themes tell it from `-` (tree-sitter-carve#577).
+(list_continuation_marker) @operator
 
 (list_marker_task
   (unchecked)) @markup.list.unchecked
@@ -334,6 +333,21 @@
   . [(block_attribute) (block_quote_marker)]*
   . (table language: (language) @_language))
   (#eq? @attribute.builtin "table")
+  (#any-of? @_language "csv" "tsv"))
+
+; A CSV or TSV code include renders as a table under `{table}` too
+; (markup-carve/carve#3335); the include must be the paragraph's only content.
+((_
+  (block_attribute args: (args (boolean_attribute) @attribute.builtin))
+  . [(block_attribute) (block_quote_marker)]*
+  . (paragraph
+      . (include_directive
+          option: (include_option
+            name: (include_option_name) @_option
+            value: (include_option_value) @_language))
+      .))
+  (#eq? @attribute.builtin "table")
+  (#eq? @_option "@code")
   (#any-of? @_language "csv" "tsv"))
 
 ((_
