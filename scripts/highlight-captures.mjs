@@ -224,9 +224,10 @@ const CASES = [
 
     /*
      * THE TWO MARKERS THE PORT DROPPED. A definition list is two markers, not
-     * one, and the `+` continuation is a list marker that opens no item - so
-     * both look like ordinary prose when their capture is missing, which is
-     * how they went unnoticed while every other list marker was covered.
+     * one, and the `+` continuation opens no item - so both look like
+     * ordinary prose when their capture is missing, which is how they went
+     * unnoticed while every other list marker was covered. The `+` is an
+     * operator, as upstream captures it.
      */
     {
         name: "a definition list's description marker is painted",
@@ -235,10 +236,10 @@ const CASES = [
         expect: 'markup.list.numbered',
     },
     {
-        name: 'the list continuation marker is painted',
+        name: 'the continuation marker is painted as an operator',
         source: '- item\n+\nan attached block\n',
         at: [1, 0],
-        expect: 'markup.list',
+        expect: 'operator',
     },
 
     /*

@@ -126,10 +126,9 @@
 
 (list_marker_description) @markup.list.numbered
 
-; The `+` list and block-quote continuation marker (PART 9 SS17). It attaches
-; the next flush-left block to the item above it, so it is a list marker even
-; though it opens no item of its own.
-(list_continuation_marker) @markup.list
+; The `+` continuation operator attaches the next block to its container. It is
+; an operator, not a list marker, so themes tell it from `-` (tree-sitter-carve#577).
+(list_continuation_marker) @operator
 
 (list_marker_task
   (unchecked)) @markup.list.unchecked
