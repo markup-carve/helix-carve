@@ -8,6 +8,19 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-10-23
+
+### Fixed
+
+- Pin tree-sitter-carve at `6564ab4`, which reads the `+` continuation
+  marker by its owner's column per markup-carve/carve#3421: an indented or
+  refused lone `+` is text, glued quote prefixes `>+`, `>>+`, `> >+` and
+  `>> +` are text, and a first-block `+` in a footnote, description or
+  stacked opener attaches its block (#62, #63, #64, #65).
+- With the same pin, quote markers in nested containers match at their own
+  column, list and fence ownership is read at the reached column, and a
+  valueless include option parses as an option (#60, #61, #63).
+
 ## [0.1.7] - 2026-10-18
 
 ### Improved
