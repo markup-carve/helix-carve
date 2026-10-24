@@ -16,6 +16,7 @@ Helix highlighting now follows the grammar fixes for continuation markers and ne
 
 - A refused or unowned `+` stays in paragraph text, including nested quotes and lines before a blank line (#70).
 - Continuation markers attach to the right list item after lazy lines, while indented quote markers and shallower quoted lines keep their intended structure (#70).
+- Padded lone `<` and `^` table spans, wrapped attributes in definitions and quotes, and refused `+` markers follow the published tree-sitter-carve 0.1.12 grammar.
 
 **Full Changelog**: https://github.com/markup-carve/helix-carve/compare/0.1.8...0.1.9
 

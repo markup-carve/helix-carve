@@ -56,7 +56,7 @@ language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "06b3d2d828aa5e94c06376c44c51bc4220a46223" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "4c6e305d9ca8a6623406dce160e40b2c3c5d8c00" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
