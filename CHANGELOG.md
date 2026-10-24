@@ -8,6 +8,17 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-10-24
+
+Helix highlighting now follows the grammar fixes for continuation markers and nested quotes.
+
+### Fixes
+
+- A refused or unowned `+` stays in paragraph text, including nested quotes and lines before a blank line (#70).
+- Continuation markers attach to the right list item after lazy lines, while indented quote markers and shallower quoted lines keep their intended structure (#70).
+
+**Full Changelog**: https://github.com/markup-carve/helix-carve/compare/0.1.8...0.1.9
+
 ## [0.1.8] - 2026-10-23
 
 ### Fixed
