@@ -22,6 +22,7 @@ an inline literal is verbatim inside but renders as prose, not code.
 - Dash bullet item
 - Another dash item
   - Nested dash item
+
 * Star bullet item
 
 1. First ordered item
@@ -30,16 +31,15 @@ an inline literal is verbatim inside but renders as prose, not code.
 - [ ] Unchecked task
 - [x] Checked task
 
-term
+:: term
 : definition of the term
 
 > A block quote line.
 > Second quoted line.
 
-| Name  | Score |
-|=======|=======|
-| Alice | 10    |
-| Bob   | 20    |
+|= Name |= Score |
+| Alice | 10     |
+| Bob   | 20     |
 
 {.note}
 ::: warning
@@ -53,7 +53,7 @@ include directive stays literal in the core, and its selector is not a tag.
 
 ![image alt](image.png)
 
-``` python
+```python
 def greet(name):
     return f"hello {name}"
 ```
