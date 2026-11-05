@@ -91,6 +91,14 @@
 
 (table_separator) @punctuation.special
 
+; A native header cell is spelled `|=`, with no separator row, so the grammar
+; leaves it a plain `table_cell`. The cell starts right after the pipe.
+((table_cell) @markup.heading
+  (#match? @markup.heading "^="))
+
+; The cell's own attribute block, alignment included (`|{.x}`, `|=>{.x}`).
+(table_cell_attributes) @attribute
+
 (table_caption
   (marker) @punctuation.special)
 (table_caption) @markup.italic
