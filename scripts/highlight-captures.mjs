@@ -335,6 +335,30 @@ const CASES = [
         at: [0, 20],
         expect: 'variable.parameter',
     },
+    {
+        name: 'a native header cell is a heading',
+        source: '|= Name |= Score |\n| a | b |\n',
+        at: [0, 9],
+        expect: 'markup.heading',
+    },
+    {
+        name: 'a header cell with a glued alignment marker is a heading',
+        source: '|= Name |=> Score |\n| a | b |\n',
+        at: [0, 9],
+        expect: 'markup.heading',
+    },
+    {
+        name: 'control: a body cell is not a heading',
+        source: '|= Name |= Score |\n| a | b |\n',
+        at: [1, 1],
+        expect: null,
+    },
+    {
+        name: "a cell's attribute block is an attribute",
+        source: '|= Name |\n|{.x} a |\n',
+        at: [1, 1],
+        expect: 'attribute',
+    },
     /*
      * Control: a `#tag` that is NOT inside a directive keeps the tag color, so
      * the rows above cannot pass by the tag pattern having been deleted.
