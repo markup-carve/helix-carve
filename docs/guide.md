@@ -196,7 +196,7 @@ helix-carve/
   patterns still win where they match.
 - **Native table headers.** Upstream colors only the row above a GFM
   separator as a header. The port also paints a native `|=` header cell as
-  `@markup.heading` and a cell's attribute block (`|{.x}`) as `@attribute`.
+  `@markup.heading` and a cell's attribute block (`|{.x}`, `|={>}`) as `@attribute`.
 - **Dropped priority directives.** Upstream tags some patterns with `(#set!
   priority N)`. This file carries none: Helix 25.07 ships no priority directive
   in any of its own bundled queries, and layers overlapping captures in the

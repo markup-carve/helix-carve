@@ -359,6 +359,30 @@ const CASES = [
         at: [1, 1],
         expect: 'attribute',
     },
+    {
+        name: 'a braced alignment on a header cell is an attribute',
+        source: '|= Name |={>} Score |\n| a |{>} b |\n',
+        at: [0, 9],
+        expect: 'attribute',
+    },
+    {
+        name: 'a braced alignment on a body cell is an attribute',
+        source: '|= Name |={>} Score |\n| a |{>} b |\n',
+        at: [1, 5],
+        expect: 'attribute',
+    },
+    {
+        name: 'a spaced thematic break is a break, not a list',
+        source: '* * *\n',
+        at: [0, 0],
+        expect: 'punctuation.special',
+    },
+    {
+        name: 'an unclosed frontmatter opener is frontmatter',
+        source: '---\ntitle: x\n',
+        at: [0, 0],
+        expect: 'punctuation.delimiter',
+    },
     /*
      * Control: a `#tag` that is NOT inside a directive keeps the tag color, so
      * the rows above cannot pass by the tag pattern having been deleted.
