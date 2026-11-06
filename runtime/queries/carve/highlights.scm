@@ -96,7 +96,7 @@
 ((table_cell) @markup.heading
   (#match? @markup.heading "^="))
 
-; The cell's own attribute block, alignment included (`|{.x}`, `|=>{.x}`).
+; The cell's own attribute block, alignment included (`|{.x}`, `|={>}`).
 (table_cell_attributes) @attribute
 
 (table_caption

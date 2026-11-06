@@ -37,9 +37,9 @@ an inline literal is verbatim inside but renders as prose, not code.
 > A block quote line.
 > Second quoted line.
 
-|= Name |= Score |
-| Alice | 10     |
-| Bob   | 20     |
+|= Name |={>} Score |
+| Alice | 10        |
+| Bob   | 20        |
 
 {.note}
 ::: warning
