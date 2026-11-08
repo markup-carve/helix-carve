@@ -119,13 +119,32 @@ colored.
 
 ## Export and import
 
-### Export to Markdown or HTML
+### Export to Markdown, HTML or PDF
 
 With carve-lsp installed, open the code action menu on a `.crv` file
-(`space` then `a`) and pick **Export as Markdown** or **Export as HTML**. The
-result goes next to the source: `notes.crv` becomes `notes.md` or `notes.html`.
-If Helix leaves the target open as a modified buffer, write it with `:w`. The
-actions need a carve-lsp release newer than 0.1.7.
+(`space` then `a`) and pick **Export as Markdown**, **Export as HTML** or
+**Export as PDF**. The result goes next to the source: `notes.crv` becomes
+`notes.md`, `notes.html` or `notes.pdf`. If Helix leaves a Markdown or HTML
+target open as a modified buffer, write it with `:w`. The Markdown and HTML
+actions need a carve-lsp release newer than 0.1.7; the PDF action needs
+carve-lsp after 0.1.15.
+
+**Export as PDF** is run by the server, which writes the file itself. It uses
+`crv2pdf` from [carve-pdf](https://github.com/markup-carve/carve-pdf) when that
+is on `PATH` (clone it and run `make install`); that gives the better page
+layout. Otherwise it prints the rendered HTML with an installed Chrome,
+Chromium or Edge in headless mode. Neither tool comes with carve-lsp. To point
+at a specific executable, add a `config` table to the language server entry in
+your `languages.toml`; Helix passes it to the server as initialization options:
+
+```toml
+[language-server.carve-lsp]
+command = "carve-lsp"
+args = ["--stdio"]
+config = { carve = { pdf = { crv2pdfPath = "/path/to/crv2pdf", browserPath = "/path/to/chromium" } } }
+```
+
+Both keys are optional. A failed export shows the tool's error output.
 
 ### Import from Markdown or HTML
 
