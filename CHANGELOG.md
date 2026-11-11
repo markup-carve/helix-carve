@@ -8,6 +8,22 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-11-11
+
+Helix follows the Carve 0.1.14 grammar and colors native table headers.
+
+### Fixes
+
+- The sample uses a real native table header and a `::` definition entry (#76).
+
+### Improvements
+
+- Native `|=` header cells take the heading color and a cell's attribute block the attribute color (#77).
+- The grammar pin follows the tree-sitter-carve release for Carve 0.1.14: braced cell alignment (`|={>}`), spaced thematic breaks, frontmatter without a closer, and two spaces after a letter or roman dot marker (#78).
+- The guide documents the carve-lsp Export as PDF action and its `carve.pdf.crv2pdfPath` and `carve.pdf.browserPath` options (#80).
+
+**Full Changelog**: https://github.com/markup-carve/helix-carve/compare/0.1.9...0.1.10
+
 ## [0.1.9] - 2026-10-24
 
 Helix highlighting now follows the grammar fixes for continuation markers and nested quotes.
