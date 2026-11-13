@@ -91,6 +91,33 @@
 
 (table_separator) @punctuation.special
 
+; A `+` continuation row: its marker and its pipes. The cells are inline.
+(table_continuation_row
+  "+" @operator)
+
+(table_continuation_row
+  "|" @punctuation.special)
+
+; A one-cell row reads on into its continuation line: the row's own pipe and
+; the `+` behind it sit inside the cell.
+(table_cell
+  "|" @punctuation.special
+  .
+  "+" @operator)
+
+; A cell holding only `^` or `<` is a row span or a column span.
+((table_cell
+  .
+  [
+    "^"
+    "<"
+  ] @operator
+  .) @_cell
+  (#match? @_cell "^[ \\t]*[<^][ \\t]*$"))
+
+(table_separator
+  (table_cell_alignment) @operator)
+
 ; A native header cell is spelled `|=`, with no separator row, so the grammar
 ; leaves it a plain `table_cell`. The cell starts right after the pipe.
 ((table_cell) @markup.heading
@@ -98,6 +125,12 @@
 
 ; The cell's own attribute block, alignment included (`|{.x}`, `|={>}`).
 (table_cell_attributes) @attribute
+
+; The `=` of a native header cell.
+((table_cell
+  .
+  "=" @operator) @_cell
+  (#match? @_cell "^="))
 
 (table_caption
   (marker) @punctuation.special)
@@ -377,6 +410,12 @@
 (inline_link
   (inline_link_destination) @markup.link.url)
 
+(citation_group) @string.special
+
+(callout_list) @markup.list
+
+(callout_list_item) @markup.list
+
 (link_reference_definition
   ":" @punctuation.special)
 
@@ -450,3 +489,41 @@
   (footnote_marker_begin)
   (footnote_marker_end)
 ] @punctuation.bracket
+
+; Markers inside constructs an earlier pattern paints as a whole. They sit
+; last so they win over those patterns. The opener of a cell marker run and
+; of an inline note stay under the whole-node capture.
+(table_cell_attributes
+  (table_cell_alignment) @operator)
+
+(table_cell_attributes
+  (args) @property)
+
+(div_title) @string
+
+(div_title
+  "\"" @punctuation.delimiter)
+
+(code_block_label) @label
+
+(code_block_label
+  [
+    "["
+    "]"
+  ] @punctuation.bracket)
+
+(substitution
+  to: (content) @markup.underline)
+
+(substitution
+  [
+    "{~"
+    "~>"
+    "~}"
+  ] @punctuation.delimiter)
+
+(inline_note
+  "]" @punctuation.bracket)
+
+(extension_inline
+  content: (content) @string)

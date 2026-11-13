@@ -76,6 +76,17 @@ const CASES = [
     { name: 'loose above a definition list', source: '{loose}\n:: t\n: d\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'loose through another attribute', source: '{loose}\n{.x}\n- item\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'abbr above prose', source: '{abbr=x}\ntext\n', at: [0, 1], expect: 'attribute' },
+    { name: 'a continuation row marker', source: '| a | b |\n+ c | d |\n', at: [1, 0], expect: 'operator' },
+    { name: 'a continuation row pipe', source: '| a | b |\n+ c | d |\n', at: [1, 4], expect: 'punctuation.special' },
+    { name: 'the continuation marker behind a one-cell row', source: '| a |\n+ cont cell |\n', at: [1, 0], expect: 'operator' },
+    { name: 'a native header cell marker', source: '|= Name |\n', at: [0, 1], expect: 'operator' },
+    { name: 'a row span cell', source: '| a | ^ |\n', at: [0, 6], expect: 'operator' },
+    { name: 'a column span cell', source: '| a | < |\n', at: [0, 6], expect: 'operator' },
+    { name: 'the alignment inside a cell marker run', source: '|={>} Name |\n', at: [0, 3], expect: 'operator' },
+    { name: 'the attribute list inside a cell marker run', source: '|{> .x} a |\n', at: [0, 4], expect: 'property' },
+    { name: 'a substitution arrow', source: 'a {~old~>new~} b\n', at: [0, 7], expect: 'punctuation.delimiter' },
+    { name: 'an inline note closer', source: 'x ^[a note] c\n', at: [0, 10], expect: 'punctuation.bracket' },
+    { name: 'inline extension content', source: 'a :abbr[HTML] b\n', at: [0, 8], expect: 'string' },
     {
         name: 'a bare figure opener is a composite figure',
         source: '::: figure\n![one](a.png)\n^ (a) One\n:::\n^ Figure #: Group caption\n',
@@ -340,12 +351,14 @@ const CASES = [
         source: '|= Name |= Score |\n| a | b |\n',
         at: [0, 9],
         expect: 'markup.heading',
+        under: true,
     },
     {
         name: 'a header cell with a glued alignment marker is a heading',
         source: '|= Name |=> Score |\n| a | b |\n',
         at: [0, 9],
         expect: 'markup.heading',
+        under: true,
     },
     {
         name: 'control: a body cell is not a heading',
@@ -459,7 +472,9 @@ try {
         const winner = captures
             .filter((capture) => capture.row === row && capture.column === column)
             .filter((capture) => !capture.name.startsWith('_') && !NOT_A_COLOR.has(capture.name))
-            .at(-1);
+            // `under` asks for the capture painted below the winner: a header
+            // cell whose `=` wins its first column is still a heading.
+            .at(testCase.under ? -2 : -1);
         const got = winner ? winner.name : null;
         if (got !== testCase.expect) {
             fails.push(
