@@ -36,13 +36,37 @@
     (language) @injection.language)
   (content) @injection.content)
 
-; Raw inline spans. The format is one `{=name}` token, so each format an
-; editor can highlight is named here.
+; Raw inline spans. The grammar gives the format as one `{=name}` token, not a
+; language node, so each format is named here.
 (raw_inline
   (content) @injection.content
   (raw_inline_attribute) @_format
   (#eq? @_format "{=html}")
   (#set! injection.language "html"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#any-of? @_format "{=xml}" "{=svg}")
+  (#set! injection.language "xml"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#eq? @_format "{=css}")
+  (#set! injection.language "css"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#any-of? @_format "{=js}" "{=javascript}")
+  (#set! injection.language "javascript"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#eq? @_format "{=json}")
+  (#set! injection.language "json"))
 
 (raw_inline
   (content) @injection.content
@@ -55,6 +79,12 @@
   (raw_inline_attribute) @_format
   (#eq? @_format "{=typst}")
   (#set! injection.language "typst"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#any-of? @_format "{=markdown}" "{=md}")
+  (#set! injection.language "markdown"))
 
 (frontmatter
   (language) @injection.language
