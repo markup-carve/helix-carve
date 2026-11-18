@@ -1,19 +1,19 @@
 %% This is a line comment.
 
-# Heading level 1
+= Heading level 1
 
-## Heading level 2
+== Heading level 2
 
-### Heading level 3
+=== Heading level 3
 
-#### Heading level 4
+==== Heading level 4
 
-##### Heading level 5
+===== Heading level 5
 
-###### Heading level 6
+====== Heading level 6
 
-A paragraph with *bold*, /italic/, /*bold italic*/, _underline_, and
-~strikethrough~ inline styles, plus `verbatim code` and a $`a^2 + b^2`$ math
+A paragraph with *bold*, /italic/, *bold /italic/ mix*, {_underline_}, and
+{~strikethrough~} inline styles, plus `verbatim code` and a $`a^2 + b^2`$ math
 span. Trailing comment here. %% inline trailing comment
 
 The word cat is !`/kaet/` in IPA, and !`a<b>`{.ipa} carries an attribute --
@@ -38,8 +38,8 @@ an inline literal is verbatim inside but renders as prose, not code.
 > Second quoted line.
 
 |= Name |={>} Score |
-| Alice | 10        |
-| Bob   | 20        |
+| Alice | 10 |
+| Bob | 20 |
 
 {.note}
 ::: warning
@@ -57,7 +57,6 @@ include directive stays literal in the core, and its selector is not a tag.
 def greet(name):
     return f"hello {name}"
 ```
-
 %%%
 A fenced comment block.
 Multiple lines are ignored.
@@ -72,16 +71,10 @@ Multiple lines are ignored.
 :::
 ^ Figure #: A bare `::: figure` opener is one composite figure.
 
-::: figure "A titled figure div"
-An opener with a title is a generic container, not a group.
-:::
+== Carve 0.2 shapes
 
-::: figure [gallery]
-So is one with a label.
-:::
+%% #region shapes
 
-::: figure
-:::: figure
-Groups do not nest, so this inner opener is a generic container.
-::::
-:::
+A braced highlight {=marked=} and raw output `<kbd>K</kbd>`{=html}.
+
+%% #endregion
