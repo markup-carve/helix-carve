@@ -56,12 +56,14 @@ language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "24073c00e0d149fe5250aea3ede5f11566f17d25" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "e73726083816a726f61b919c88e2b18234baf77c", subpath = "v2" }
 ```
 
 > The `rev` pins a known-good grammar commit. Bump it when you want a newer
-> grammar. For a fully offline build, point `source` at a local checkout
-> instead: `source = { path = "/abs/path/to/tree-sitter-carve" }`.
+> grammar. `subpath = "v2"` selects the Carve 0.2 grammar in the repository's
+> `v2/` directory. For a fully offline build, point `source` at that directory
+> of a local checkout instead:
+> `source = { path = "/abs/path/to/tree-sitter-carve/v2" }`.
 
 ### 2. Fetch and build the grammar
 

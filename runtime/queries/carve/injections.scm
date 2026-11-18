@@ -36,10 +36,25 @@
     (language) @injection.language)
   (content) @injection.content)
 
+; Raw inline spans. The format is one `{=name}` token, so each format an
+; editor can highlight is named here.
 (raw_inline
   (content) @injection.content
-  (raw_inline_attribute
-    (language) @injection.language))
+  (raw_inline_attribute) @_format
+  (#eq? @_format "{=html}")
+  (#set! injection.language "html"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#any-of? @_format "{=latex}" "{=tex}")
+  (#set! injection.language "latex"))
+
+(raw_inline
+  (content) @injection.content
+  (raw_inline_attribute) @_format
+  (#eq? @_format "{=typst}")
+  (#set! injection.language "typst"))
 
 (frontmatter
   (language) @injection.language
