@@ -8,6 +8,10 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+### Breaking
+
+- Helix highlights Carve 0.2 and no longer Carve 0.1. The `[[grammar]]` source loads tree-sitter-carve from the repository root, where the 0.2 grammar now lives, and drops `subpath = "v2"`. Remove the subpath from a merged `languages.toml` and rebuild the grammar.
+
 ## [0.1.10] - 2026-11-12
 
 Helix follows the Carve 0.1.14 grammar and colors native table headers.
