@@ -3,10 +3,9 @@
 # Merge this into your ~/.config/helix/languages.toml (or the languages.toml in
 # your $HELIX_RUNTIME). See README.md for full install steps.
 #
-# The [[grammar]] source below points at the Carve 0.2 grammar, which lives in
-# the v2/ directory of tree-sitter-carve on its next2 branch. For
-# offline grammar development against a local checkout, swap the `source` line
-# for the path form (shown commented out underneath).
+# The [[grammar]] source below points at the Carve 0.2 grammar of
+# tree-sitter-carve. For offline grammar development against a local checkout,
+# swap the `source` line for the path form (shown commented out underneath).
 
 # The language server is OPTIONAL: everything above works without it, and Helix
 # reports a missing server as unavailable rather than failing to open the file.
@@ -44,9 +43,9 @@ language-servers = ["carve-lsp"]
 
 [[grammar]]
 name = "carve"
-source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "f634264a130c6c01a1aae96ae7d733c71e45b966", subpath = "v2" }
+source = { git = "https://github.com/markup-carve/tree-sitter-carve", rev = "e374066b34357f171d237c20a21df8f70f279267" }
 
 # Local (path) form -- use this for offline grammar development:
 # [[grammar]]
 # name = "carve"
-# source = { path = "/path/to/tree-sitter-carve/v2" }
+# source = { path = "/path/to/tree-sitter-carve" }
