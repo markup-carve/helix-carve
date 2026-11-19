@@ -396,6 +396,18 @@ const CASES = [
         expect: 'comment',
     },
     {
+        name: 'the box of an ordered item',
+        source: '1. [ ] a\n',
+        at: [0, 3],
+        expect: 'markup.list.unchecked',
+    },
+    {
+        name: 'a trailing comment after a row',
+        source: '| a | %% x\n',
+        at: [0, 6],
+        expect: 'comment',
+    },
+    {
         name: 'a thematic break',
         source: '***\n',
         at: [0, 0],

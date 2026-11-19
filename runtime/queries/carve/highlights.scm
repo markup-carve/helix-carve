@@ -168,6 +168,13 @@
 (list_marker_task
   (checked)) @markup.list.checked
 
+; The box of an ordered item (C2-B-046).
+(list_item
+  checkmark: (unchecked) @markup.list.unchecked)
+
+(list_item
+  checkmark: (checked) @markup.list.checked)
+
 (list_item
   (term) @type.builtin)
 
