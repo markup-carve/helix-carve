@@ -57,8 +57,6 @@ const NOT_A_COLOR = new Set(['none', 'conceal', 'spell', 'nospell']);
  * Shapes the Carve 0.2 grammar does not parse yet. A pending case that fails is
  * reported and skipped; one that passes fails the run, so the flag gets dropped.
  */
-// An attribute line above a blank line is text (C2-B-192).
-const TS702 = 'markup-carve/tree-sitter-carve#702';
 
 const CASES = [
     { name: 'kbd on a span', source: '[Tab]{kbd}\n', at: [0, 6], expect: 'attribute.builtin' },
@@ -72,7 +70,7 @@ const CASES = [
     { name: 'loose above a list is an ordinary attribute', source: '{loose}\n- item\n', at: [0, 1], expect: 'attribute' },
     { name: 'loose above prose', source: '{loose}\ntext\n', at: [0, 1], expect: 'attribute' },
     { name: 'table through another attribute', source: '{table}\n{#t}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
-    { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: null, pending: TS702 },
+    { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: null },
     { name: 'table above another language', source: '{table}\n```python\nx\n```\n', at: [0, 1], expect: 'attribute' },
     { name: 'table above a csv code include', source: '{table}\n{{ data.csv @code:csv }}\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'table above a tsv code include', source: '{table}\n{{ data.tsv @code:tsv }}\n', at: [0, 1], expect: 'attribute.builtin' },
