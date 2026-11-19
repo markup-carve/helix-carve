@@ -400,8 +400,6 @@
 (inline_link
   (inline_link_destination) @markup.link.url)
 
-(citation_group) @string.special
-
 (callout_list) @markup.list
 
 (callout_list_item) @markup.list
