@@ -368,16 +368,14 @@
   (#any-of? @_language "csv" "tsv"))
 
 ; A CSV or TSV code include renders as a table under `{table}` too
-; (markup-carve/carve#3335); the include must be the paragraph's only content.
+; (C2-N-045). A directive alone on its line is a block of its own (C2-B-156).
 ((_
   (block_attribute args: (args (boolean_attribute) @attribute.builtin))
   . [(block_attribute) (block_quote_marker)]*
-  . (paragraph
-      . (include_directive
-          option: (include_option
-            name: (include_option_name) @_option
-            value: (include_option_value) @_language))
-      .))
+  . (include_directive
+      option: (include_option
+        name: (include_option_name) @_option
+        value: (include_option_value) @_language)))
   (#eq? @attribute.builtin "table")
   (#eq? @_option "@code")
   (#any-of? @_language "csv" "tsv"))

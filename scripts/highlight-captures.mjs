@@ -57,21 +57,22 @@ const NOT_A_COLOR = new Set(['none', 'conceal', 'spell', 'nospell']);
  * Shapes the Carve 0.2 grammar does not parse yet. A pending case that fails is
  * reported and skipped; one that passes fails the run, so the flag gets dropped.
  */
-const TS695 = 'markup-carve/tree-sitter-carve#695';
+// An attribute line above a blank line is text (C2-B-192).
+const TS702 = 'markup-carve/tree-sitter-carve#702';
 
 const CASES = [
     { name: 'kbd on a span', source: '[Tab]{kbd}\n', at: [0, 6], expect: 'attribute.builtin' },
     { name: 'abbr on a span', source: '[ABC]{abbr=ABC}\n', at: [0, 6], expect: 'attribute.builtin' },
     { name: 'time on a span', source: '[10:00]{time=10:00}\n', at: [0, 8], expect: 'attribute.builtin' },
     { name: 'kbd above prose', source: '{kbd}\ntext\n', at: [0, 1], expect: 'attribute' },
-    { name: 'table above CSV', source: '{table}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin', pending: TS695 },
-    { name: 'table inside a quote', source: '> {table}\n> ```csv\n> a,b\n> ```\n', at: [0, 3], expect: 'attribute.builtin', pending: TS695 },
-    { name: 'table through a quoted attribute', source: '> {table}\n> {#id}\n> ```csv\n> a,b\n> ```\n', at: [0, 3], expect: 'attribute.builtin', pending: TS695 },
+    { name: 'table above CSV', source: '{table}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table inside a quote', source: '> {table}\n> ```csv\n> a,b\n> ```\n', at: [0, 3], expect: 'attribute.builtin' },
+    { name: 'table through a quoted attribute', source: '> {table}\n> {#id}\n> ```csv\n> a,b\n> ```\n', at: [0, 3], expect: 'attribute.builtin' },
     { name: 'table above prose', source: '{table}\ntext\n', at: [0, 1], expect: 'attribute' },
     { name: 'loose above a list is an ordinary attribute', source: '{loose}\n- item\n', at: [0, 1], expect: 'attribute' },
     { name: 'loose above prose', source: '{loose}\ntext\n', at: [0, 1], expect: 'attribute' },
-    { name: 'table through another attribute', source: '{table}\n{#t}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin', pending: TS695 },
-    { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin', pending: TS695 },
+    { name: 'table through another attribute', source: '{table}\n{#t}\n```csv\na,b\n```\n', at: [0, 1], expect: 'attribute.builtin' },
+    { name: 'table after a blank line', source: '{table}\n\n```csv\na,b\n```\n', at: [0, 1], expect: null, pending: TS702 },
     { name: 'table above another language', source: '{table}\n```python\nx\n```\n', at: [0, 1], expect: 'attribute' },
     { name: 'table above a csv code include', source: '{table}\n{{ data.csv @code:csv }}\n', at: [0, 1], expect: 'attribute.builtin' },
     { name: 'table above a tsv code include', source: '{table}\n{{ data.tsv @code:tsv }}\n', at: [0, 1], expect: 'attribute.builtin' },
@@ -79,8 +80,8 @@ const CASES = [
     { name: 'table above a code include of another language', source: '{table}\n{{ a.js @code:js }}\n', at: [0, 1], expect: 'attribute' },
     { name: 'table above a plain csv include', source: '{table}\n{{ data.csv }}\n', at: [0, 1], expect: 'attribute' },
     { name: 'abbr above prose', source: '{abbr=x}\ntext\n', at: [0, 1], expect: 'attribute' },
-    { name: 'a continuation row marker', source: '| a | b |\n+ c | d |\n', at: [1, 0], expect: 'operator', pending: TS695 },
-    { name: 'a continuation row pipe', source: '| a | b |\n+ c | d |\n', at: [1, 4], expect: 'punctuation.special', pending: TS695 },
+    { name: 'a continuation row marker', source: '| a | b |\n+ c | d |\n', at: [1, 0], expect: 'operator' },
+    { name: 'a continuation row pipe', source: '| a | b |\n+ c | d |\n', at: [1, 4], expect: 'punctuation.special' },
     { name: 'the continuation marker behind a one-cell row', source: '| a |\n+ cont cell |\n', at: [1, 0], expect: 'operator' },
     { name: 'a native header cell marker', source: '|= Name |\n', at: [0, 1], expect: 'operator' },
     { name: 'a row span cell', source: '| a | ^ |\n', at: [0, 6], expect: 'operator' },
