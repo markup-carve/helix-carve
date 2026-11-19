@@ -10,7 +10,7 @@ Carve support for Helix, using the Tree-sitter Carve revision pinned in `languag
 
 ## Install
 
-Merge this repository’s [`languages.toml`](languages.toml) into `~/.config/helix/languages.toml`, then install its queries and build the grammar as shown in the [guide](docs/guide.md#install). The grammar pin is `rev = "d0aa419a93aedb5a2b1d385a2fe753726d00c402"`, matching `languages.toml`.
+Merge this repository’s [`languages.toml`](languages.toml) into `~/.config/helix/languages.toml`, then install its queries and build the grammar as shown in the [guide](docs/guide.md#install). The grammar pin is `rev = "97aac85279065871696f50be6174f9234082aea5"`, matching `languages.toml`.
 
 ## Usage
 
