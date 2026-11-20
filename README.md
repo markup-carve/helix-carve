@@ -1,6 +1,6 @@
 # helix-carve
 
-Carve support for Helix, using the Tree-sitter Carve revision pinned in `languages.toml`. It provides highlighting, indentation, text objects, and optional `carve-lsp` support. See the [Carve documentation](https://markup-carve.github.io/carve/) for the markup language.
+Carve 0.2 support for Helix, using the Tree-sitter Carve revision pinned in `languages.toml`. Carve 0.1 source can read differently; `carve upgrade` rewrites it. It provides highlighting, indentation, text objects, and optional `carve-lsp` support. See the [Carve documentation](https://markup-carve.github.io/carve/) for the markup language.
 
 ## Features
 
