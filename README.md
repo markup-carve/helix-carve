@@ -6,6 +6,7 @@ Carve 0.2 support for Helix, using the Tree-sitter Carve revision pinned in `lan
 
 - Highlighting and language injections.
 - Text objects and indentation.
+- A tags query for symbol pickers and a spell-check query for [Mitos](docs/guide.md#mitos).
 - Optional language server features.
 
 ## Install

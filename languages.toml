@@ -32,6 +32,7 @@ injection-regex = "^(carve|crv)$"
 # document. This matches the root pattern carve-lsp documents.
 roots = [".git"]
 comment-token = "%%"
+block-comment-tokens = { start = "{%", end = "%}" }
 indent = { tab-width = 2, unit = "  " }
 language-servers = ["carve-lsp"]
 

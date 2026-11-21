@@ -30,7 +30,7 @@ jobs:
 
       - name: Check tree-sitter query files are present
         run: |
-          for q in highlights indents injections textobjects; do
+          for q in highlights indents injections textobjects tags spellcheck; do
             test -s "runtime/queries/carve/$q.scm" || { echo "Missing or empty runtime/queries/carve/$q.scm"; exit 1; }
           done
           echo "All Helix query files present."
