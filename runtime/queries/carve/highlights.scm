@@ -10,8 +10,8 @@
 ; Neovim-only @spell / @nospell captures and conceal directives are dropped.
 
 ; --- Headings -----------------------------------------------------------------
-; All six levels map correctly to .1 .. .6. The verified Carve heading markers
-; are "# " (2 chars) through "###### " (7 chars). The whole heading node gets the
+; All six levels map correctly to .1 .. .6. A Carve 0.2 heading marker is a run
+; of one to six `#` or `=` followed by a space. The whole heading node gets the
 ; numbered scope; the leading marker gets @markup.heading.marker. The marker
 ; carries its whole separator RUN, so the level is matched rather than compared:
 ; a `##   h` marker is "##   " and an equality test against "## " lost its level.
@@ -20,27 +20,27 @@
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.1
-  (#match? @markup.heading.marker "^# +$"))
+  (#match? @markup.heading.marker "^(#|=) +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.2
-  (#match? @markup.heading.marker "^## +$"))
+  (#match? @markup.heading.marker "^(##|==) +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.3
-  (#match? @markup.heading.marker "^### +$"))
+  (#match? @markup.heading.marker "^(###|===) +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.4
-  (#match? @markup.heading.marker "^#### +$"))
+  (#match? @markup.heading.marker "^(####|====) +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.5
-  (#match? @markup.heading.marker "^##### +$"))
+  (#match? @markup.heading.marker "^(#####|=====) +$"))
 
 ((heading
   (marker) @markup.heading.marker) @markup.heading.6
-  (#match? @markup.heading.marker "^###### +$"))
+  (#match? @markup.heading.marker "^(######|======) +$"))
 
 ; --- Thematic break / rules ---------------------------------------------------
 (thematic_break) @punctuation.special
@@ -89,8 +89,6 @@
 (table_row
   "|" @punctuation.special)
 
-(table_separator) @punctuation.special
-
 ; A `+` continuation row: its marker and its pipes. The cells are inline.
 (table_continuation_row
   "+" @operator)
@@ -114,9 +112,6 @@
   ] @operator
   .) @_cell
   (#match? @_cell "^[ \\t]*[<^][ \\t]*$"))
-
-(table_separator
-  (table_cell_alignment) @operator)
 
 ; A native header cell is spelled `|=`, with no separator row, so the grammar
 ; leaves it a plain `table_cell`. The cell starts right after the pipe.
@@ -167,15 +162,18 @@
 
 (list_marker_description) @markup.list.numbered
 
-; The `+` continuation operator attaches the next block to its container. It is
-; an operator, not a list marker, so themes tell it from `-` (tree-sitter-carve#577).
-(list_continuation_marker) @operator
-
 (list_marker_task
   (unchecked)) @markup.list.unchecked
 
 (list_marker_task
   (checked)) @markup.list.checked
+
+; The box of an ordered item (C2-B-046).
+(list_item
+  checkmark: (unchecked) @markup.list.unchecked)
+
+(list_item
+  checkmark: (checked) @markup.list.checked)
 
 (list_item
   (term) @type.builtin)
@@ -239,7 +237,6 @@
 
 (insert) @markup.underline
 (delete) @markup.strikethrough
-(substitution) @markup.strikethrough
 (editorial_comment) @comment
 
 [
@@ -297,6 +294,7 @@
 ; --- Comments -----------------------------------------------------------------
 [
   (comment_line)
+  (region_marker)
   (fenced_comment_block)
   (braced_comment)
   (trailing_comment)
@@ -377,25 +375,17 @@
   (#any-of? @_language "csv" "tsv"))
 
 ; A CSV or TSV code include renders as a table under `{table}` too
-; (markup-carve/carve#3335); the include must be the paragraph's only content.
+; (C2-N-045). A directive alone on its line is a block of its own (C2-B-156).
 ((_
   (block_attribute args: (args (boolean_attribute) @attribute.builtin))
   . [(block_attribute) (block_quote_marker)]*
-  . (paragraph
-      . (include_directive
-          option: (include_option
-            name: (include_option_name) @_option
-            value: (include_option_value) @_language))
-      .))
+  . (include_directive
+      option: (include_option
+        name: (include_option_name) @_option
+        value: (include_option_value) @_language)))
   (#eq? @attribute.builtin "table")
   (#eq? @_option "@code")
   (#any-of? @_language "csv" "tsv"))
-
-((_
-  (block_attribute args: (args (boolean_attribute) @attribute.builtin))
-  . [(block_attribute) (block_quote_marker)]*
-  . [(list) (definition_list)])
-  (#eq? @attribute.builtin "loose"))
 
 ; The language attribute: `{:fr}`, `{:zh-Hant}` (markup-carve/carve#1114).
 (language_attribute) @attribute
@@ -409,8 +399,6 @@
 
 (inline_link
   (inline_link_destination) @markup.link.url)
-
-(citation_group) @string.special
 
 (callout_list) @markup.list
 
@@ -511,16 +499,6 @@
     "["
     "]"
   ] @punctuation.bracket)
-
-(substitution
-  to: (content) @markup.underline)
-
-(substitution
-  [
-    "{~"
-    "~>"
-    "~}"
-  ] @punctuation.delimiter)
 
 (inline_note
   "]" @punctuation.bracket)

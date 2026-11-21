@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, next2]
   pull_request:
 
 # Every job below carries a timeout-minutes bound, so a hung step fails in
@@ -30,7 +30,7 @@ jobs:
 
       - name: Check tree-sitter query files are present
         run: |
-          for q in highlights indents injections textobjects; do
+          for q in highlights indents injections textobjects tags spellcheck; do
             test -s "runtime/queries/carve/$q.scm" || { echo "Missing or empty runtime/queries/carve/$q.scm"; exit 1; }
           done
           echo "All Helix query files present."
@@ -74,8 +74,10 @@ jobs:
             echo "Could not extract grammar rev from languages.toml"
             exit 1
           fi
-          echo "Pinned tree-sitter-carve rev: $rev"
+          subpath=$(sed -n 's/.*subpath = "\([A-Za-z0-9_./-]*\)".*/\1/p' languages.toml | head -n1)
+          echo "Pinned tree-sitter-carve rev: $rev, subpath: ${subpath:-.}"
           echo "rev=$rev" >> "$GITHUB_OUTPUT"
+          echo "dir=$RUNNER_TEMP/tree-sitter-carve/${subpath:-.}" >> "$GITHUB_OUTPUT"
 
       - name: Clone tree-sitter-carve at pinned rev
         run: |
@@ -84,7 +86,7 @@ jobs:
 
       - name: Build grammar
         # src/parser.c is committed upstream, so no `tree-sitter generate` needed.
-        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        working-directory: ${{ steps.grammar-rev.outputs.dir }}
         run: tree-sitter build
 
       # A query naming a node the grammar does not have captures nothing and
@@ -93,7 +95,7 @@ jobs:
       # `tree-sitter query` rejects an unknown node type, which is the only
       # thing that can tell the two apart.
       - name: Queries reference nodes the pinned grammar has
-        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        working-directory: ${{ steps.grammar-rev.outputs.dir }}
         run: |
           sample="$RUNNER_TEMP/query-probe.crv"
           printf '# H\n\n- item\n\n> quote\n' > "$sample"
@@ -117,11 +119,11 @@ jobs:
       - name: Resolve effective highlight captures
         working-directory: ${{ github.workspace }}
         env:
-          TS_CWD: ${{ runner.temp }}/tree-sitter-carve
+          TS_CWD: ${{ steps.grammar-rev.outputs.dir }}
         run: node scripts/highlight-captures.mjs
 
       - name: Parse sample .crv files
-        working-directory: ${{ runner.temp }}/tree-sitter-carve
+        working-directory: ${{ steps.grammar-rev.outputs.dir }}
         run: |
           files=$(find "$GITHUB_WORKSPACE" -name '*.crv' -not -path '*/.git/*' | sort)
           if [ -z "$files" ]; then
