@@ -12,6 +12,13 @@ Releases before 0.1.5 are described on the
 
 - Helix highlights Carve 0.2 and no longer Carve 0.1. The `[[grammar]]` source loads tree-sitter-carve from the repository root, where the 0.2 grammar now lives, and drops `subpath = "v2"`. Remove the subpath from a merged `languages.toml` and rebuild the grammar.
 
+### Improvements
+
+- `tags.scm` lists headings, ids, and link and footnote definitions as symbols. Mitos uses it for `Space s` and `Space S` when no language server runs.
+- `spellcheck.scm` gives Mitos the regions to spell-check; Helix ignores the file.
+- `block-comment-tokens` sets `{% %}` as the block comment pair.
+- The guide has a Mitos section, including the `spelling.languages` setting and why it must stay out of a Helix `languages.toml`.
+
 ## [0.1.10] - 2026-11-12
 
 Helix follows the Carve 0.1.14 grammar and colors native table headers.

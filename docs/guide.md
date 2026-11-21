@@ -19,7 +19,11 @@ extension.
 - Language injections so fenced code blocks, raw blocks, inline raw spans, math
   (LaTeX), and frontmatter are highlighted with their target grammar, and
   `TODO`, `NOTE` and `FIXME` are marked inside comments.
-- A `%%` comment token, so `gc` comment toggling works.
+- A `%%` comment token, so `gc` comment toggling works, and `{% %}` as the block
+  comment pair.
+- A tags query (`tags.scm`) that lists headings, ids, and link and footnote
+  definitions as symbols, for editors that build a symbol picker from it.
+- A spell-check query (`spellcheck.scm`) for [Mitos](#mitos); Helix ignores it.
 - Language-server support via
   [carve-lsp](https://github.com/markup-carve/carve-lsp) - diagnostics, hover,
   completion, go-to-definition, workspace-wide rename, find-references,
@@ -51,6 +55,7 @@ file-types = ["crv"]
 injection-regex = "^(carve|crv)$"
 roots = [".git"]
 comment-token = "%%"
+block-comment-tokens = { start = "{%", end = "%}" }
 indent = { tab-width = 2, unit = "  " }
 language-servers = ["carve-lsp"]
 
@@ -116,6 +121,32 @@ line names `carve-lsp`.
 Open a `.crv` file (for example [`sample.crv`](../sample.crv)) in Helix and
 confirm headings, emphasis, code, lists, links, tables, divs, and comments are
 colored.
+
+## Mitos
+
+[Mitos](https://mitos.computer/) is a Helix fork and reads the same files.
+Install them as above, with `~/.config/mitos/` in place of `~/.config/helix/`,
+and build the grammar with `ms --grammar fetch` and `ms --grammar build`.
+
+Mitos adds two things this package supports:
+
+- **Symbols without a server.** `Space s` and `Space S` use `carve-lsp` when it
+  runs and fall back to `tags.scm` otherwise. Upstream Helix 25.07 has no such
+  fallback and needs the server for its symbol pickers.
+- **Spell checking.** `spellcheck.scm` checks paragraphs, headings, table cells,
+  captions, terms and definitions, and skips code, math, raw spans, link
+  destinations, labels, attributes, tags, mentions, symbols and comments.
+  Findings show as hints and in the diagnostics picker (`Space d`). Choose the
+  dictionaries in your own Mitos `languages.toml`:
+
+  ```toml
+  [[language]]
+  name = "carve"
+  spelling.languages = ["en_US", "de_DE"]
+  ```
+
+  Keep this key out of a Helix `languages.toml`: Helix rejects the unknown
+  `spelling` field and then ignores the whole file.
 
 ## Export and import
 
@@ -188,7 +219,9 @@ helix-carve/
 │           ├── highlights.scm     # Helix-flavored scopes; correct h1-h6 mapping
 │           ├── injections.scm     # code / raw / math / frontmatter / comment injections
 │           ├── textobjects.scm    # function/class/parameter/entry/comment
-│           └── indents.scm        # container-based indent scopes
+│           ├── indents.scm        # container-based indent scopes
+│           ├── tags.scm           # symbols: headings, ids, reference definitions
+│           └── spellcheck.scm     # Mitos spell-check regions
 ├── scripts/
 │   └── highlight-captures.mjs     # what the highlights query actually paints
 ├── sample.crv                     # feature-exercising example document
@@ -204,9 +237,10 @@ helix-carve/
   marker and references a non-existent seven-hash marker). The query here maps
   all six markers (`# ` through `###### `) to `@markup.heading.1` ..
   `@markup.heading.6` correctly. Verified against a six-level sample (see below).
-- **Dropped Neovim-only bits.** Neovim's `@spell` / `@nospell` captures and the
-  conceal / `#offset!` directives used purely for concealing markers are not
-  part of Helix's model, so they were left out to keep the queries clean.
+- **Dropped Neovim-only bits.** Neovim's `@spell` / `@nospell` captures in the
+  highlights and the conceal / `#offset!` directives used purely for concealing
+  markers are not part of Helix's model, so they were left out. Spell-check
+  regions live in `spellcheck.scm` instead, which only Mitos reads.
 - **Textobject suffixes.** Helix uses `.inside` / `.around` (not Neovim's
   `.inner` / `.outer`), and supports a fixed set of kinds; only the kinds that
   map onto Carve are kept.
