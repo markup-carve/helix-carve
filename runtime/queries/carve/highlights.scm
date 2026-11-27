@@ -232,6 +232,26 @@
 (include_option_separator) @punctuation.delimiter
 (include_option_value) @constant
 
+; Snippet names and markers follow C2-B-236 and C2-I-128.
+(snippet_name) @variable
+
+(snippet_use
+  [
+    "{{"
+    "$"
+    "}}"
+  ] @punctuation.special)
+
+(snippet_definition
+  [
+    "{$"
+    "}"
+    "{"
+  ] @punctuation.special)
+
+(snippet_definition
+  ":" @punctuation.delimiter)
+
 (mention) @constant
 (tag) @tag
 

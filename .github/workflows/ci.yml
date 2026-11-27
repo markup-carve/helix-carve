@@ -122,6 +122,12 @@ jobs:
           TS_CWD: ${{ steps.grammar-rev.outputs.dir }}
         run: node scripts/highlight-captures.mjs
 
+      - name: Check snippet tags
+        working-directory: ${{ github.workspace }}
+        env:
+          TS_CWD: ${{ steps.grammar-rev.outputs.dir }}
+        run: node scripts/snippet-tags.mjs
+
       - name: Parse sample .crv files
         working-directory: ${{ steps.grammar-rev.outputs.dir }}
         run: |
