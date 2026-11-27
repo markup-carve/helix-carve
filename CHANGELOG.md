@@ -8,16 +8,26 @@ Releases before 0.1.5 are described on the
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-27
+
+Helix highlights Carve 0.2.
+
 ### Breaking
 
-- Helix highlights Carve 0.2 and no longer Carve 0.1. The `[[grammar]]` source loads tree-sitter-carve from the repository root, where the 0.2 grammar now lives, and drops `subpath = "v2"`. Remove the subpath from a merged `languages.toml` and rebuild the grammar.
+- Helix highlights Carve 0.2 and no longer Carve 0.1. The `[[grammar]]` source loads tree-sitter-carve from the repository root, where the 0.2 grammar now lives, and drops `subpath = "v2"`. Remove the subpath from a merged `languages.toml` and rebuild the grammar (#87, #93).
+- The queries drop the nodes Carve 0.2 removed: substitutions, the GFM separator row, the `+` list continuation, `{loose}` and the citation group (#87, #96).
 
 ### Improvements
 
-- `tags.scm` lists headings, ids, and link and footnote definitions as symbols. Mitos uses it for `Space s` and `Space S` when no language server runs.
-- `spellcheck.scm` gives Mitos the regions to spell-check; Helix ignores the file.
-- `block-comment-tokens` sets `{% %}` as the block comment pair.
-- The guide has a Mitos section, including the `spelling.languages` setting and why it must stay out of a Helix `languages.toml`.
+- `=` heading markers take their level, region markers take the comment color, and raw inline spans inject their language from the `{=format}` token, now including xml, svg, css, js, json and markdown (#87).
+- Table continuation rows, cell alignment and attribute lists, native header signs, row and column spans, admonition titles, code block labels and inline extension content get captures (#86).
+- An ordered task item's box takes the same color as a bullet task box (#92).
+- `tags.scm` lists headings, ids, and link and footnote definitions as symbols. Mitos uses it for `Space s` and `Space S` when no language server runs (#100).
+- `spellcheck.scm` gives Mitos the regions to spell-check; Helix ignores the file (#100).
+- `block-comment-tokens` sets `{% %}` as the block comment pair (#100).
+- The guide has a Mitos section, including the `spelling.languages` setting and why it must stay out of a Helix `languages.toml` (#100).
+
+**Full Changelog**: https://github.com/markup-carve/helix-carve/compare/0.1.10...0.2.0
 
 ## [0.1.10] - 2026-11-12
 
